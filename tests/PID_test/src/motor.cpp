@@ -26,8 +26,8 @@ RPMController::RPMController(uint8_t In1, uint8_t In2, uint8_t Encoder1, uint8_t
     pinMode(kIn1, OUTPUT);
     pinMode(kIn2, OUTPUT);
   
-    pinMode(kEncoder1, INPUT);
-    pinMode(kEncoder2, INPUT);
+    pinMode(kEncoder1, INPUT_PULLUP);
+    pinMode(kEncoder2, INPUT_PULLUP);
   
     // Attach ISR interrupts
     attachInterruptArg(kEncoder1, *RPMController::ChanA, this, CHANGE);
