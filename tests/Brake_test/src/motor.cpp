@@ -46,7 +46,7 @@ PositionController::PositionController(uint8_t In1, uint8_t In2, uint8_t Encoder
  * Input a negative position for one way rotation, positive for another
  */
 void PositionController::setPosition(int position){
-     
+     idealPosition = map(position,-360,360,-44,44);
 }
 
 float PositionController::readPosition(){
