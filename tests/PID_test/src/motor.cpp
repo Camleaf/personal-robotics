@@ -5,6 +5,31 @@
 #include "driver/ledc.h"
 #include "stdint.h"
 
+//////////////////////
+// Define ISR Routines
+//////////////////////
+
+void IRAM_ATTR ChanA(void* arg){
+    RPMController* self = static_cast<RPMController*>(arg);
+    if (digitalRead(self->kEncoder2) == HIGH) { // Will need to determine in testing which way counts as forwards
+      self->realDir = 1;
+    } else {
+    self->realDir = 0;
+    }
+    self->edgeCount += 1;
+}
+
+void IRAM_ATTR ChanB(void *arg){
+    RPMController* self = static_cast<RPMController*>(arg);
+    self->edgeCount += 1;
+}
+
+///////////////////
+// Initialize Class
+///////////////////
+
+
+
 RPMController::RPMController(uint8_t In1, uint8_t In2, uint8_t Encoder1, uint8_t Encoder2, int motorMaxRPM, int sampleTime, int effectivePPR, int RPMTolerance, bool debug, uint8_t PWMResolution){
     // Define constants
     kIn1 = In1;
@@ -32,8 +57,8 @@ RPMController::RPMController(uint8_t In1, uint8_t In2, uint8_t Encoder1, uint8_t
     pinMode(kEncoder2, INPUT_PULLUP);
   
     // Attach ISR interrupts
-    attachInterruptArg(digitalPinToInterrupt(kEncoder1), RPMController::ChanA, this, CHANGE);
-    attachInterruptArg(digitalPinToInterrupt(kEncoder2), RPMController::ChanB, this, CHANGE);
+    attachInterruptArg(digitalPinToInterrupt(kEncoder1), ChanA, this, CHANGE);
+    attachInterruptArg(digitalPinToInterrupt(kEncoder2), ChanB, this, CHANGE);
 
     
     // Starts forwards
@@ -63,27 +88,6 @@ void RPMController::setPIDValues(int kP, int kI, int kD){
 void RPMController::setDebug(bool enabled){
     kDebug = enabled;   
 }
-
-
-
-void IRAM_ATTR RPMController::ChanA(void* arg){
-    RPMController* self = static_cast<RPMController*>(arg);
-    if (digitalRead(self->kEncoder2) == HIGH) { // Will need to determine in testing which way counts as forwards
-      self->realDir = 1;
-    } else {
-    self->realDir = 0;
-    }
-    self->edgeCount += 1;
-}
-
-
-
-void IRAM_ATTR RPMController::ChanB(void *arg){
-    RPMController* self = static_cast<RPMController*>(arg);
-    self->edgeCount += 1;
-}
-
-
 
 void RPMController::tick(){
     if (millis() - lastTime >= kSampleTime) {

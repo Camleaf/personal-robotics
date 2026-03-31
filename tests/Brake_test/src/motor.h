@@ -40,18 +40,18 @@ class PositionController {
         
         
 
-    
-    private:
-        
-        static void IRAM_ATTR Channel(void *arg);
-
-        // Pins connected to respective control on motor driver
-        uint8_t kIn1;
-        uint8_t kIn2;
-
         // Digital input pins which the encoder motors are connected to
         uint8_t kEncoder1;
         uint8_t kEncoder2;
+        
+        // Pins connected to respective control on motor driver
+        uint8_t kIn1;
+        uint8_t kIn2;
+         
+        volatile int lastEncoded = 0;
+        volatile int edgePosition = 0; 
+    
+    private:
 
         // The rated RPM of the motor
         int kMotorMaxRPM;
@@ -86,9 +86,6 @@ class PositionController {
         
         int idealPosition;
         int realPosition;
-        
-        volatile int lastEncoded = 0;
-        volatile int edgePosition = 0; 
         long lastTime = 0;
 
         uint32_t outValue = 0;

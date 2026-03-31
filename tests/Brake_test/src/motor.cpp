@@ -6,6 +6,32 @@
 #include "driver/ledc.h"
 #include "stdint.h"
 
+
+/////////////////////
+// Define ISR routine
+/////////////////////
+
+
+void IRAM_ATTR Channel(void* arg){
+    PositionController* self = static_cast<PositionController*>(arg);
+    int a = digitalRead(self->kEncoder1);
+    int b = digitalRead(self->kEncoder2);
+    int encoded = (a << 1) | b;
+    int sum = (self->lastEncoded << 2) | encoded;
+
+    if (sum == 0b0001 || sum == 0b0111 || sum == 0b1110 || sum == 0b1000) {
+        self->edgePosition++; // Clockwise
+    } else if (sum == 0b0010 || sum == 0b1011 || sum == 0b1101 || sum == 0b0100) {
+        self->edgePosition--; // Counter-clockwise
+    }
+
+    self->lastEncoded = encoded;
+}
+
+///////////////////
+// Initialize Class
+///////////////////
+
 PositionController::PositionController(uint8_t In1, uint8_t In2, uint8_t Encoder1, uint8_t Encoder2, int motorMaxRPM, int sampleTime, int effectivePPR, int PositionTolerance, bool debug, uint8_t PWMResolution){
     // Define constants
     kIn1 = In1;
@@ -32,8 +58,8 @@ PositionController::PositionController(uint8_t In1, uint8_t In2, uint8_t Encoder
     pinMode(kEncoder2, INPUT_PULLUP);
   
     // Attach ISR interrupts
-    attachInterruptArg(kEncoder1, *PositionController::Channel, this, CHANGE);
-    attachInterruptArg(kEncoder2, *PositionController::Channel, this, CHANGE);
+    attachInterruptArg(kEncoder1, Channel, this, CHANGE);
+    attachInterruptArg(kEncoder2, Channel, this, CHANGE);
 
     
     // Starts forwards
@@ -62,26 +88,6 @@ void PositionController::setPIDValues(int kP, int kI, int kD){
 void PositionController::setDebug(bool enabled){
     kDebug = enabled;   
 }
-
-
-
-void IRAM_ATTR PositionController::Channel(void* arg){
-    PositionController* self = static_cast<PositionController*>(arg);
-    int a = digitalRead(self->kEncoder1);
-    int b = digitalRead(self->kEncoder2);
-    int encoded = (a << 1) | b;
-    int sum = (self->lastEncoded << 2) | encoded;
-
-    if (sum == 0b0001 || sum == 0b0111 || sum == 0b1110 || sum == 0b1000) {
-        self->edgePosition++; // Clockwise
-    } else if (sum == 0b0010 || sum == 0b1011 || sum == 0b1101 || sum == 0b0100) {
-        self->edgePosition--; // Counter-clockwise
-    }
-
-    self->lastEncoded = encoded;
-}
-
-
 
 void PositionController::tick(){
      

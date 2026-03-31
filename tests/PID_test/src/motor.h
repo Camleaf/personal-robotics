@@ -41,20 +41,18 @@ class RPMController {
         void tick();
         
         
-
-    
-    private:
-        
-        static void IRAM_ATTR ChanA(void *arg);
-        static void IRAM_ATTR ChanB(void *arg);
-
-        // Pins connected to respective control on motor driver
-        uint8_t kIn1;
-        uint8_t kIn2;
+        volatile long edgeCount = 0;
+        volatile bool prevDir = true;
+        volatile bool realDir = true;
 
         // Digital input pins which the encoder motors are connected to
         uint8_t kEncoder1;
         uint8_t kEncoder2;
+
+    private:
+        // Pins connected to respective control on motor driver
+        uint8_t kIn1;
+        uint8_t kIn2;
 
         // The rated RPM of the motor
         int kMotorMaxRPM;
@@ -87,10 +85,6 @@ class RPMController {
         bool withinTolerance = false; 
         int idealRPM;
         float realRPM;
-        
-        volatile bool prevDir = true;
-        volatile bool realDir = true;
-        volatile long edgeCount = 0;
         
         long lastTime = 0;
 
