@@ -4,6 +4,7 @@
 #include <Arduino.h>
 
 #include "src/drivetrain.h"
+#include "src/arm.h"
 #include <Bluepad32.h>
 
 
