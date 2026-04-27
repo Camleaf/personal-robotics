@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 #include <cstdint>
 #include "./drivetrain.h"
@@ -7,63 +8,60 @@ using namespace std;
 
 
 // Channel defines
-// back right
-#define kunitbr MCPWM_UNIT_1
 
-#define kunitbl MCPWM_UNIT_1
+#define kchanbr1 0
+#define kchanbr2 1
 
-#define kunitfr MCPWM_UNIT_0
+#define kchanbl1 2
+#define kchanbl2 3
 
-#define kunitfl MCPWM_UNIT_0
+#define kchanfr1 4
+#define kchanfr2 5
 
-#define ktime1 MCPWM_TIMER_0
-#define ktime2 MCPWM_TIMER_1
+#define kchanfl1 6
+#define kchanfl2 7
 
-void setMotor(mcpwm_unit_t unit, mcpwm_timer_t timer, double val){
-    float duty = (float)abs(val) * 100.0 / 255.0; //MCPWM needs 0 - 100 float
 
-    if (val > 0) {
-        mcpwm_set_duty(unit, timer, MCPWM_GEN_A, duty);
-        mcpwm_set_duty_type(unit, timer, MCPWM_GEN_A, MCPWM_DUTY_MODE_0);
-        mcpwm_set_signal_low(unit, timer, MCPWM_GEN_B); // Ensure other pin is OFF
-    } else if (val < 0) {
-        mcpwm_set_signal_low(unit, timer, MCPWM_GEN_A);
-        mcpwm_set_duty(unit, timer, MCPWM_GEN_B, duty);
-        mcpwm_set_duty_type(unit, timer, MCPWM_GEN_B, MCPWM_DUTY_MODE_0);
+void setMotor(uint8_t chan1, uint8_t chan2, int val){
+    if (val >= 0) {
+        ledcWrite(chan1,val);
+        ledcWrite(chan2,0);
     } else {
-        mcpwm_set_signal_low(unit, timer, MCPWM_GEN_A);
-        mcpwm_set_signal_low(unit, timer, MCPWM_GEN_B);
+        ledcWrite(chan2, -val);
+        ledcWrite(chan1,0);
     }
 }
 
-void setupMCPWM(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t kfr1, uint8_t kfr2, uint8_t kfl1, uint8_t kfl2){
-    //Init gpios for mcpwm
-    // front left
-    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, kfl1);
-    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, kfl2);
-    // front right
-    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1A, kfr1);
-    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1B, kfr2);
-    //back left
-    mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0A, kbl1);
-    mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0B, kbl2);
-    //back right
-    mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM1A, kbr1);
-    mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM1B, kbr2);
-
-    mcpwm_config_t pwm_conf;
-    pwm_conf.frequency = 5000;        
-    pwm_conf.cmpr_a = 0;          
-    pwm_conf.cmpr_b = 0;          
-    pwm_conf.counter_mode = MCPWM_UP_COUNTER;
-    pwm_conf.duty_mode = MCPWM_DUTY_MODE_0;
+void setupLedc(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t kfr1, uint8_t kfr2, uint8_t kfl1, uint8_t kfl2){
+    ledcSetup(kchanbr1,5000,8);
+    ledcAttachPin(kbr1,kchanbr1);
     
-    // Init mcpwm 
-    mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_conf);
-    mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_1, &pwm_conf);
-    mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_0, &pwm_conf);
-    mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_1, &pwm_conf);
+    ledcSetup(kchanbr1,5000,8);
+    ledcAttachPin(kbr2,kchanbr2);
+
+    ledcSetup(kchanbl1,5000,8);
+    ledcAttachPin(kbl1,kchanbl1);
+
+    ledcSetup(kchanbl2,5000,8);
+    ledcAttachPin(kbl2,kchanbl2);
+
+    ledcSetup(kchanfr1,5000,8);
+    ledcAttachPin(kfr1,kchanfr1);
+
+    ledcSetup(kchanfr2,5000,8);
+    ledcAttachPin(kfr2,kchanfr2);
+
+    ledcSetup(kchanfl1,5000,8);
+    ledcAttachPin(kfl1,kchanfl1);
+
+    ledcSetup(kchanfl2,5000,8);
+    ledcAttachPin(kfl2,kchanfl2);
 }
+
+void closeLedc(){
+    
+}
+
 
 Arcade::Arcade(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t kfr1, uint8_t kfr2, uint8_t kfl1, uint8_t kfl2, int deadzone){
     
@@ -80,7 +78,7 @@ Arcade::Arcade(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t k
     this->kfl2 = kfl2;
     this->deadzone = deadzone;
 
-    setupMCPWM(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2);
+    setupLedc(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2);
     
 }
 
@@ -130,10 +128,10 @@ void Arcade::updateMotor(int joyX, int joyY){
         rightSide = 0;
     }
     
-    setMotor(kunitbr,MCPWM_TIMER_1,rightSide); //backright
-    setMotor(kunitfr,MCPWM_TIMER_1,rightSide); //frontright
-    setMotor(kunitbl,MCPWM_TIMER_0,leftSide); //backleft
-    setMotor(kunitfl,MCPWM_TIMER_0,leftSide); //frontleft
+    setMotor(kchanbr1,kchanbr2,rightSide);
+    setMotor(kchanfr1,kchanfr2,rightSide);
+    setMotor(kchanbl1,kchanbl2,leftSide);
+    setMotor(kchanfl1,kchanfl2,leftSide);
 
 }
 
@@ -153,7 +151,7 @@ Mecanum::Mecanum(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t
     this->kfl2 = kfl2;
     this->deadzone = deadzone;
     
-    setupMCPWM(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2);
+    setupLedc(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2);
 }
 
 
@@ -183,11 +181,15 @@ void Mecanum::updateMotor(int joyX, int joyX2, int joyY){
     if (abs(y_drive) < deadzone) y_drive = 0;
     if (abs(turn) < deadzone) turn = 0;
     
-    setMotor(kunitbr,MCPWM_TIMER_1,-(y_drive+x_drive-turn)); //backright, reversed
-    setMotor(kunitfr,MCPWM_TIMER_1,-(y_drive-x_drive-turn)); //frontright, reversed
-    setMotor(kunitbl,MCPWM_TIMER_0,y_drive-x_drive+turn); //backleft
-    setMotor(kunitfl,MCPWM_TIMER_0,y_drive+x_drive+turn); //frontleft
-    
+
+    // Back right motor, reversed
+    setMotor(kchanbr2,kchanbr1,y_drive + x_drive - turn);
+    // Front right motor, reversed
+    setMotor(kchanfr2,kchanfr1,y_drive - x_drive - turn);
+    // Back left motor
+    setMotor(kchanbl1,kchanbl2,y_drive - x_drive + turn);
+    // Front left motor
+    setMotor(kchanfl1,kchanfl2,y_drive + x_drive + turn);
 }
 
 
