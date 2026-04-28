@@ -12,7 +12,7 @@ Servo mid;
 int pos = 0;    // variable to store the servo position
 int groundServo = 18;
 int groundServoReversed = 13;
-int middleServo = 10;
+int middleServo = 26;
  
 void setup() {
 	ESP32PWM::allocateTimer(0);
@@ -24,6 +24,11 @@ void setup() {
                               //
 	groundrev.setPeriodHertz(50);    // standard 50 hz servo
 	groundrev.attach(groundServoReversed); // attaches the servo on pin 18 to the servo object
+  
+  mid.setPeriodHertz(50);
+  mid.attach(middleServo);
+  
+  mid.write(0);
   ground.write(0); // Zero the servo
   groundrev.write(180);
 }
