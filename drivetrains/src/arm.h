@@ -6,6 +6,10 @@
 
 using namespace std;
 
+#define kbaseidx 0
+#define kmididx 1
+#define kclrotidx 2
+#define kclawidx 3
 
 class Arm {
     public:

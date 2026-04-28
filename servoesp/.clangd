@@ -1,0 +1,13 @@
+CompileFlags:
+  CompilationDatabase: "build"
+  Add: [
+    "--include=Arduino.h" # Forces Serial/delay definitions into every file
+  ]
+  Remove: [
+    "-f*",            
+    "-m*",            
+    "-W*" 
+  ]
+Index:
+  Background: Build
+

@@ -4,11 +4,6 @@
 #include <cstdint>
 #include <math.h>
 
-#define kbaseidx 0
-#define kmididx 1
-#define kclrotidx 2
-#define kclawidx 3
-
 bool inBounds(int val, array<int,2> bounds){
     return bounds[0] <= val && val <= bounds[1];
 }
@@ -83,7 +78,7 @@ void Arm::setClawPoint(int x, int y){
 
     double baseVectorLength = sqrt(pow(xVector,2) + pow(yVector,2));
     double baseVectorRadAngle = atan2(yVector,xVector)+M_PI;
-
+    Serial.println(baseVectorLength);
 
     if (baseVectorLength > 1.0) {
         Serial.println("Bad points");
@@ -98,7 +93,8 @@ void Arm::setClawPoint(int x, int y){
     int baseJoint = constrain(round(baseJointRadAngle*180/M_PI),0,360);
     int upperJoint = constrain(round(upperJointRadAngle*180/M_PI),0,360);
     
-    
+    Serial.printf("Basejoint %d\n", baseJoint);
+    Serial.printf("uppjoint %d\n\n", upperJoint);
     servos[kbaseidx].write(baseJoint);
     servos[kmididx].write(upperJoint);
 
