@@ -136,7 +136,12 @@ void Arm::setClawPoint(int x, int y){
     if (combVectorRadAngle < 0){
         if (combVectorRadAngle > -M_PI/2) {Serial.println("Can't put in Q4");return;}
         // Otherwise quadrant 3, and we can put there
-        combVectorRadAngle = 270-(-combVectorRadAngle-90);
+        
+        //combVectorRadAngle = (M_PI*3/2)-(-combVectorRadAngle-(M_PI/2));
+        //M_PI*3/2+combVectorRadAngle+M_PI/2
+        //4*M_PI/2+combVectorRadAngle
+        //2*M_PI+combVectorRadAngle
+        combVectorRadAngle = 2*M_PI+combVectorRadAngle;
     }
 
     double rawRadAngle = invCosLaw(upperJointVector,combVectorLength,baseJointVector); // check this math
@@ -146,25 +151,25 @@ void Arm::setClawPoint(int x, int y){
 
     
     if (combVectorRadAngle<0){ // Physical limitations, arm can't clip though car
-        if (baseJointRadAngle > 180 || baseJointRadAngle < 0){
+        if (baseJointRadAngle > M_PI || baseJointRadAngle < 0){
             baseJointRadAngle = NAN;
         }
-        if (invbaseJointRadAngle > 180 || baseJointRadAngle < 0){
+        if (invbaseJointRadAngle > M_PI || baseJointRadAngle < 0){
             invbaseJointRadAngle = NAN;
         }
     }
 
     double upperJointRadAngle = invCosLaw(combVectorLength,upperJointVector,baseJointVector);
-    double invupperJointRadAngle = 180 - upperJointRadAngle;
+    double invupperJointRadAngle = M_PI - upperJointRadAngle;
 
 //------------------Calculate Angles---------------------
     int baseJoint;
     int upperJoint;
-    if (!isnan(baseJointRadAngle) && upperJointRadAngle>= 0 && upperJointRadAngle <= 180){
+    if (!isnan(baseJointRadAngle) && upperJointRadAngle>= 0 && upperJointRadAngle <= M_PI){
         baseJoint = constrain(round(baseJointRadAngle*180/M_PI),0,180); 
         upperJoint = constrain(round(upperJointRadAngle*180/M_PI+90),0,180);
 
-    } else if (!isnan(invbaseJointRadAngle) && invupperJointRadAngle>=0 && invupperJointRadAngle<=180){
+    } else if (!isnan(invbaseJointRadAngle) && invupperJointRadAngle>=0 && invupperJointRadAngle<=M_PI){
         baseJoint = constrain(round(invbaseJointRadAngle*180/M_PI),0,180); 
         upperJoint = constrain(round(invupperJointRadAngle*180/M_PI+90),0,180);
 
@@ -174,8 +179,6 @@ void Arm::setClawPoint(int x, int y){
     } 
     
 #if ARMDEBUG
-    Serial.printf("uppjointnoconst %f\n", upperJointRadAngle*180/M_PI);
-    Serial.printf("uppjointradnoconst %f\n", upperJointRadAngle);
     Serial.printf("Basejoint %d\n", baseJoint);
     Serial.printf("uppjoint %d\n\n", upperJoint);
 #endif
