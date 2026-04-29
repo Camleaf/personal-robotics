@@ -33,6 +33,7 @@ class Arm {
         void setClawPoint(int x, int y); // Where 0,0 is the base of the claw. and x,y is the desired claw point in mm
         
         void begin();
+        void neutral();
         void zero();
 
 

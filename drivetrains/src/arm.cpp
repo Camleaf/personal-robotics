@@ -189,12 +189,16 @@ void Arm::setClawPoint(int x, int y){
     servos[kbase2idx].write(baseJoint);
     servos[kmididx].write(upperJoint);
 
-    
-
 }
 
-void Arm::zero(){
+void Arm::neutral(){
+    servos[kmididx].write(0);
+    servos[kbaseidx].write(0);
+    servos[kbase2idx].write(180);
+}
+
+void Arm::zero(){ // Dont use this when the bot is on the robot
      servos[kmididx].write(0);
      servos[kbaseidx].write(180); // Zero the servo
-     servos[kbase2idx].write(0); // Inversed
+     servos[kbase2idx].write(90); // So that stuff doesnt get damaged
 }
