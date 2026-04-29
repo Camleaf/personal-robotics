@@ -107,7 +107,7 @@ void setup(){
     drivetrain.invertMotor(1,true); // invert frontright
     */
     arm.begin();
-    arm.setClawPoint(-50,70);
+    arm.setClawPoint(-10,70);
     //arm.zero();  
 }
 

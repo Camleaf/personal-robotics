@@ -123,7 +123,12 @@ void Arm::setClawPoint(int x, int y){
 #endif 
         return;
     }
-
+    //  -------------
+    //  TODO
+    // Solve for bsaejoint since that has most restrictions, then use the angle provided to solve for upperjoint angle. Will give better results.
+    //
+    //--------------------
+    
     // Solve for joint1 and joint2 angle with cosine law
     
     double baseJointRadAngle = invCosLaw(upperJointVector,baseVectorLength,baseJointVector) + baseVectorRadAngle; // I may need to solve for cases because of primary trig ratios may cause this to be off in other quadrants
@@ -135,7 +140,7 @@ void Arm::setClawPoint(int x, int y){
     }
 
     int baseJoint = constrain(round(baseJointRadAngle*180/M_PI),0,180); 
-    int upperJoint = constrain((int)round(upperJointRadAngle*180/M_PI+90)%180,0,180);
+    int upperJoint = constrain(round(upperJointRadAngle*180/M_PI+90),0,180);
     
     // CAST rule
     // never use Q4
