@@ -81,12 +81,13 @@ void Arm::setClawPoint(int x, int y){
     double xVector = ((double)x)/totalLength;
     double yVector = ((double)y)/totalLength;
     
-    if (yVector < -baseHeight){
+    if (y < -baseHeight){
         return;
     }
     double combVectorLength = sqrt(pow(xVector,2) + pow(yVector,2));
-    double combVectorRadAngle = atan2(yVector,xVector);
+    double combVectorRadAngle = atan2(yVector,xVector); // returns -pi to +pi, -180 to 180
     double combVectorDegAngle = combVectorRadAngle*180/M_PI;
+    
 #if ARMDEBUG
     Serial.println("-----NEW------");
     Serial.println(combVectorLength);
@@ -96,19 +97,21 @@ void Arm::setClawPoint(int x, int y){
     if (combVectorLength > 1.0) {
         Serial.println("Bad points\n\n");
         return;
-    } else if (abs(combVectorDegAngle) <= 1 || abs(abs(combVectorDegAngle)-180)<=1){
+    }
+//------------------DIVIDE BY ZERO EDGE CASES------------------
+    if (abs(combVectorDegAngle) <= 1 || abs(abs(combVectorDegAngle)-180)<=1){ // divide by 0 edge cases
         Serial.println("Edge case 0 deg");
         if (x < 0 || combVectorDegAngle < 0){
-            servos[kbaseidx].write(0);
-            servos[kbase2idx].write(180);
+            servos[kbase2idx].write(0);
+            servos[kbaseidx].write(180);
             servos[kmididx].write(90);
 #if ARMDEBUG
             Serial.printf("Basejoint %d\n", 0);
             Serial.printf("uppjoint %d\n\n", 90);
 #endif
         } else {            
-            servos[kbaseidx].write(180);
-            servos[kbase2idx].write(0);
+            servos[kbase2idx].write(180);
+            servos[kbaseidx].write(0);
             servos[kmididx].write(90);
 #if ARMDEBUG
              Serial.printf("Basejoint %d\n", 180);
@@ -119,8 +122,8 @@ void Arm::setClawPoint(int x, int y){
         return;
     } else if (abs(abs(combVectorDegAngle)-90)<=1){
         Serial.println("Edge case 90");
-        servos[kbaseidx].write(90);
         servos[kbase2idx].write(90);
+        servos[kbaseidx].write(90);
         servos[kmididx].write(90);
 #if ARMDEBUG
         Serial.printf("Basejoint %d\n", 90);
@@ -128,47 +131,47 @@ void Arm::setClawPoint(int x, int y){
 #endif 
         return;
     }
-    //  -------------
-    //  TODO
-    // Solve for bsaejoint since that has most restrictions, then use the angle provided to solve for upperjoint angle. Will give better results.
-    // ALSO REMEMBER baseVectorLength and baseJointVector refer to TWO DIFFERENT THINGS FOR SOME REASON
-    //--------------------
-    
-    // Solve for joint1 and joint2 angle with cosine law
-    
-    double baseJointRadAngle = invCosLaw(upperJointVector,combVectorLength,baseJointVector) + combVectorRadAngle; // I may need to solve for cases because of primary trig ratios may cause this to be off in other quadrants
-    
-    if (isnan(baseJointRadAngle)){
-        Serial.println("bad triangle 1");
-        return;
-    }
-    
 
-    // CAST rule
-    // never use Q4
-    if (combVectorDegAngle > 180) { // Q3
-        baseJointRadAngle = 0; // This is very bad we can not be doing this
-    } else if (combVectorDegAngle > 90){ // Q2
-        baseJointRadAngle = M_PI-baseJointRadAngle;
-    } 
-    
-    int baseJoint = constrain(round(baseJointRadAngle*180/M_PI),0,180); 
-    
-    double upperJointRadAngle = cosLaw(baseJointVector,combVectorLength,baseJointRadAngle); // Still needs more math, maybe look at atan2
-
-    if (combVectorDegAngle > 180) { // Q3
-    } else if (combVectorDegAngle > 90){ // Q2
-    } 
-
-    //double upperJointRadAngle = invCosLaw(baseVectorLength,upperJointVector,baseJointVector); // Old way
-     
-    if (isnan(upperJointRadAngle == NAN)){
-        Serial.println("bad triangle 2");
-        return;
+    // Quadrants 3 and 4
+    if (combVectorRadAngle < 0){
+        if (combVectorRadAngle > -M_PI/2) {Serial.println("Can't put in Q4");return;}
+        // Otherwise quadrant 3, and we can put there
+        combVectorRadAngle = 270-(-combVectorRadAngle-90);
     }
 
-    int upperJoint = constrain(round(upperJointRadAngle*180/M_PI+90),0,180);
+    double rawRadAngle = invCosLaw(upperJointVector,combVectorLength,baseJointVector); // check this math
+    // always two solutions to the inverse kinematics.
+    double baseJointRadAngle = rawRadAngle + combVectorRadAngle;
+    double invbaseJointRadAngle = combVectorRadAngle - rawRadAngle;
+
     
+    if (combVectorRadAngle<0){ // Physical limitations, arm can't clip though car
+        if (baseJointRadAngle > 180 || baseJointRadAngle < 0){
+            baseJointRadAngle = NAN;
+        }
+        if (invbaseJointRadAngle > 180 || baseJointRadAngle < 0){
+            invbaseJointRadAngle = NAN;
+        }
+    }
+
+    double upperJointRadAngle = invCosLaw(combVectorLength,upperJointVector,baseJointVector);
+    double invupperJointRadAngle = 180 - upperJointRadAngle;
+
+//------------------Calculate Angles---------------------
+    int baseJoint;
+    int upperJoint;
+    if (!isnan(baseJointRadAngle) && upperJointRadAngle>= 0 && upperJointRadAngle <= 180){
+        baseJoint = constrain(round(baseJointRadAngle*180/M_PI),0,180); 
+        upperJoint = constrain(round(upperJointRadAngle*180/M_PI+90),0,180);
+
+    } else if (!isnan(invbaseJointRadAngle) && invupperJointRadAngle>=0 && invupperJointRadAngle<=180){
+        baseJoint = constrain(round(invbaseJointRadAngle*180/M_PI),0,180); 
+        upperJoint = constrain(round(invupperJointRadAngle*180/M_PI+90),0,180);
+
+    } else {
+        Serial.println("Can't reach desired position");
+        return;
+    } 
     
 #if ARMDEBUG
     Serial.printf("uppjointnoconst %f\n", upperJointRadAngle*180/M_PI);
@@ -179,8 +182,8 @@ void Arm::setClawPoint(int x, int y){
 
     if (baseJoint > 180 || baseJoint < 0) {Serial.println("huge number error");return;} // should never see this
 
-    servos[kbaseidx].write(baseJoint);
-    servos[kbase2idx].write(180-baseJoint);
+    servos[kbaseidx].write(180-baseJoint);
+    servos[kbase2idx].write(baseJoint);
     servos[kmididx].write(upperJoint);
 
     
@@ -189,6 +192,6 @@ void Arm::setClawPoint(int x, int y){
 
 void Arm::zero(){
      servos[kmididx].write(0);
-     servos[kbaseidx].write(0); // Zero the servo
-     servos[kbase2idx].write(180); // Inversed
+     servos[kbaseidx].write(180); // Zero the servo
+     servos[kbase2idx].write(0); // Inversed
 }
