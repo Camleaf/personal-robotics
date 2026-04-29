@@ -11,8 +11,8 @@ Servo mid;
  
 int pos = 0;    // variable to store the servo position
 int groundServo = 18;
-int groundServoReversed = 13;
-int middleServo = 26;
+int groundServoReversed = 27;
+int middleServo = 19;
  
 void setup() {
 	ESP32PWM::allocateTimer(0);

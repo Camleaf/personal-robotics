@@ -28,12 +28,13 @@
 #define turnPower 128
 
 //// Arm
-#define kbase1 32
-#define kmid1 33
+#define kbase1 18
+#define kmid1 19
+#define kbase2 27
 #define kclrot1 10
 #define kclaw1 11
-const int baseJointLength = 75; // mm
-const int upperJointLength = 95; // mm
+const float baseJointLength = 82.2; // mm
+const float upperJointLength = 103.8; // mm
 const int clawLength = 0; // mm
 const int baseHeight = 10; // mm 
 
@@ -41,7 +42,7 @@ const int baseHeight = 10; // mm
 
 
 //Arcade drivetrain(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2);
-Arm arm(kbase1,kmid1,kclrot1,kclaw1,baseJointLength,upperJointLength,clawLength,baseHeight);
+Arm arm(kbase1,kbase2,kmid1,kclrot1,kclaw1,baseJointLength,upperJointLength,clawLength,baseHeight);
 
 
 
@@ -87,6 +88,8 @@ void processControllers(){
 
 
 
+int armx = baseJointLength+upperJointLength;
+int army = 0;
 
 void setup(){
     Serial.begin(115200);
@@ -103,12 +106,10 @@ void setup(){
     drivetrain.invertMotor(0,true); // invert backright
     drivetrain.invertMotor(1,true); // invert frontright
     */
-    
-    arm.setBaseJointRange(0,135);
-    arm.setClawOCpoint(0,180);
-    arm.setUpperJointRange(0,180);
-    arm.setClawPoint(50,50);
-  }
+    arm.begin();
+    arm.setClawPoint(-50,70);
+    //arm.zero();  
+}
 
 
 
@@ -118,7 +119,29 @@ void loop(){
         processControllers();
     }
     */
-    Serial.println(arm.servos[kbaseidx].read());
-    arm.servos[kbaseidx].write(100);
-    delay(800);
+    /*
+    if (Serial.available()) {
+      char c = Serial.read();
+      if (c == '+') armx += 5;
+      if (c == '-') armx -= 5;
+      
+      army = sqrt(pow(baseJointLength+upperJointLength,2)-pow(armx,2));
+      Serial.printf("army %d", army);
+      arm.setClawPoint(armx,army);
+
+    }*/
+    /*
+    for (int i = -180; i <= 180; i+=5){
+      army = sqrt(pow(baseJointLength+upperJointLength,2)-pow(i,2));
+      arm.setClawPoint(i,army);
+      delay(15);
+    }
+    
+    
+    for (int i = 180; i >= -180; i-=5){
+      army = sqrt(pow(baseJointLength+upperJointLength,2)-pow(i,2));
+      arm.setClawPoint(i,army);
+      delay(15);
+    }*/
+
 }

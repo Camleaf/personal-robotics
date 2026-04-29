@@ -6,14 +6,17 @@
 
 using namespace std;
 
+#define ARMDEBUG true 
+
 #define kbaseidx 0
 #define kmididx 1
 #define kclrotidx 2
 #define kclawidx 3
+#define kbase2idx 4
 
 class Arm {
     public:
-        Arm(uint8_t kbase1, uint8_t kmid1, uint8_t kclrot1, uint8_t kclaw1,
+        Arm(uint8_t kbase1, uint8_t kbase2, uint8_t kmid1, uint8_t kclrot1, uint8_t kclaw1,
             int baseJointLength, int upperJointLength, int clawLength, // In millimetres
             int baseHeight
         );
@@ -29,19 +32,21 @@ class Arm {
 
         void setClawPoint(int x, int y); // Where 0,0 is the base of the claw. and x,y is the desired claw point in mm
         
+        void begin();
+        void zero();
 
 
-
-    array<Servo,4> servos;
+    array<Servo,5> servos;
         
     uint8_t kbase = 0;
     uint8_t kmid = 0;
     uint8_t kclrot = 0;
     uint8_t kclaw = 0;
+    uint8_t kbase2 = 0;
 
     double baseJointVector = .5;
     double upperJointVector = .5;
-    int totalLength = 10;
+    double totalLength = 10;
     int baseHeight = 0;
     array<int,2> baseJointRange = {0,135};
     array<int,2> midJointRange = {20,160};
