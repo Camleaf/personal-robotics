@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#define ARMDEBUG true 
+#define ARMDEBUG false 
 
 #define kbaseidx 0
 #define kmididx 1
@@ -30,8 +30,12 @@ class Arm {
 
         void setClawRot(int angle);
 
-        void setClawPoint(int x, int y); // Where 0,0 is the base of the claw. and x,y is the desired claw point in mm
-        
+        bool setClawPoint(int x, int y); // Where 0,0 is the base of the claw. and x,y is the desired claw point in mm
+        bool setServoRots(int base, int mid);
+        bool setBaseRot(int base);
+        bool setMidRot(int mid);
+
+
         void begin();
         void neutral();
         void zero();
