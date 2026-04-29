@@ -72,6 +72,10 @@ double invCosLaw(double a, double b, double c){
     return acos((pow(c,2)+pow(b,2)-pow(a,2))/(2*b*c));
 }
 
+double cosLaw(double b, double c, double A){
+    return pow(b,2) + pow(c,2) + 2*b*c*cos(A);
+}
+
 void Arm::setClawPoint(int x, int y){
     // Basically just inverse kinematics 
     double xVector = ((double)x)/totalLength;
@@ -80,20 +84,21 @@ void Arm::setClawPoint(int x, int y){
     if (yVector < -baseHeight){
         return;
     }
-    double baseVectorLength = sqrt(pow(xVector,2) + pow(yVector,2));
-    double baseVectorRadAngle = atan2(yVector,xVector);
-    double baseVectorDegAngle = baseVectorRadAngle*180/M_PI;
+    double combVectorLength = sqrt(pow(xVector,2) + pow(yVector,2));
+    double combVectorRadAngle = atan2(yVector,xVector);
+    double combVectorDegAngle = combVectorRadAngle*180/M_PI;
 #if ARMDEBUG
     Serial.println("-----NEW------");
-    Serial.println(baseVectorLength);
-    Serial.println(baseVectorDegAngle);
+    Serial.println(combVectorLength);
+    Serial.println(combVectorDegAngle);
 #endif
-    if (baseVectorLength > 1.0) {
+    
+    if (combVectorLength > 1.0) {
         Serial.println("Bad points\n\n");
         return;
-    } else if (abs(baseVectorDegAngle) <= 1 || abs(abs(baseVectorDegAngle)-180)<=1){
+    } else if (abs(combVectorDegAngle) <= 1 || abs(abs(combVectorDegAngle)-180)<=1){
         Serial.println("Edge case 0 deg");
-        if (x < 0 || baseVectorDegAngle < 0){
+        if (x < 0 || combVectorDegAngle < 0){
             servos[kbaseidx].write(0);
             servos[kbase2idx].write(180);
             servos[kmididx].write(90);
@@ -112,7 +117,7 @@ void Arm::setClawPoint(int x, int y){
 
         }
         return;
-    } else if (abs(abs(baseVectorDegAngle)-90)<=1){
+    } else if (abs(abs(combVectorDegAngle)-90)<=1){
         Serial.println("Edge case 90");
         servos[kbaseidx].write(90);
         servos[kbase2idx].write(90);
@@ -126,31 +131,45 @@ void Arm::setClawPoint(int x, int y){
     //  -------------
     //  TODO
     // Solve for bsaejoint since that has most restrictions, then use the angle provided to solve for upperjoint angle. Will give better results.
-    //
+    // ALSO REMEMBER baseVectorLength and baseJointVector refer to TWO DIFFERENT THINGS FOR SOME REASON
     //--------------------
     
     // Solve for joint1 and joint2 angle with cosine law
     
-    double baseJointRadAngle = invCosLaw(upperJointVector,baseVectorLength,baseJointVector) + baseVectorRadAngle; // I may need to solve for cases because of primary trig ratios may cause this to be off in other quadrants
-    double upperJointRadAngle = invCosLaw(baseVectorLength,upperJointVector,baseJointVector);
+    double baseJointRadAngle = invCosLaw(upperJointVector,combVectorLength,baseJointVector) + combVectorRadAngle; // I may need to solve for cases because of primary trig ratios may cause this to be off in other quadrants
+    
+    if (isnan(baseJointRadAngle)){
+        Serial.println("bad triangle 1");
+        return;
+    }
+    
+
+    // CAST rule
+    // never use Q4
+    if (combVectorDegAngle > 180) { // Q3
+        baseJointRadAngle = 0; // This is very bad we can not be doing this
+    } else if (combVectorDegAngle > 90){ // Q2
+        baseJointRadAngle = M_PI-baseJointRadAngle;
+    } 
+    
+    int baseJoint = constrain(round(baseJointRadAngle*180/M_PI),0,180); 
+    
+    double upperJointRadAngle = cosLaw(baseJointVector,combVectorLength,baseJointRadAngle); // Still needs more math, maybe look at atan2
+
+    if (combVectorDegAngle > 180) { // Q3
+    } else if (combVectorDegAngle > 90){ // Q2
+    } 
+
+    //double upperJointRadAngle = invCosLaw(baseVectorLength,upperJointVector,baseJointVector); // Old way
      
-    if (isnan(baseJointRadAngle) || isnan(upperJointRadAngle == NAN)){
-        Serial.println("bad triangle");
+    if (isnan(upperJointRadAngle == NAN)){
+        Serial.println("bad triangle 2");
         return;
     }
 
-    int baseJoint = constrain(round(baseJointRadAngle*180/M_PI),0,180); 
     int upperJoint = constrain(round(upperJointRadAngle*180/M_PI+90),0,180);
     
-    // CAST rule
-    // never use Q4
-    if (baseVectorDegAngle > 180) { // Q3
-        baseJoint = 0;
-    } else if (baseVectorDegAngle > 90){ // Q2
-        baseJoint = 180-baseJoint;
-        upperJoint = 180-upperJoint;
-    } 
-
+    
 #if ARMDEBUG
     Serial.printf("uppjointnoconst %f\n", upperJointRadAngle*180/M_PI);
     Serial.printf("uppjointradnoconst %f\n", upperJointRadAngle);
