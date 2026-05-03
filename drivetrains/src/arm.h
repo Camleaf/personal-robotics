@@ -26,7 +26,7 @@ class Arm {
         void setClawOCpoint(int low, int high); // Degrees of closed and open points for claw servo
 
         void setClawGrip(bool closed);
-
+        void setClawWrist(bool down);
 
         void setClawRot(int angle);
 
@@ -39,7 +39,8 @@ class Arm {
         void begin();
         void neutral();
         void zero();
-
+        void stored();
+        void pickup();
 
     array<Servo,5> servos;
         

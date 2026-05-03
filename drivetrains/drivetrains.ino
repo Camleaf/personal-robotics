@@ -33,17 +33,17 @@
 #define kbase1 18
 #define kmid1 19
 #define kbase2 27
-#define kclrot1 10
-#define kclaw1 11
+#define kclrot1 4
+#define kclaw1 5
 const float baseJointLength = 82.2; // mm
 const float upperJointLength = 103.8; // mm
-const int clawLength = 0; // mm
+const int clawLength = 110; // mm
 const int baseHeight = 40; // mm 
 
 
 
 
-//Arcade drivetrain(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2);
+Mecanum drivetrain(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2);
 Arm arm(kbase1,kbase2,kmid1,kclrot1,kclaw1,baseJointLength,upperJointLength,clawLength,baseHeight);
 
 
@@ -69,71 +69,48 @@ void onDisconnectedController(ControllerPtr cptr) {
     }
 }
 
-int armx = 100;
-int army = 100;
-int movamt = 3;
+
+int movamt = 20;
 int baserot = 0;
 int midrot = 0;
-
+int lastTime;
 void updateArmPosition(ControllerPtr cptr){
-  /*
+  if (millis()-lastTime < 500){
+    return;
+  }
   uint8_t dpad = cptr->dpad();
   if (dpad & DPAD_UP) {
-        Serial.println("Arrow Up Pressed");
-        if (arm.setClawPoint(armx,army+movamt)){
-            army+=movamt;
-        }
-          
-    }
-    
-    if (dpad & DPAD_DOWN) {
-        Serial.println("Arrow Down Pressed");
-        if (arm.setClawPoint(armx,army-movamt)){
-            army-=movamt;
-        }
-    }
+      Serial.println("Arrow Up Pressed");
+      
+  }
+  
+  if (dpad & DPAD_DOWN) {
+      Serial.println("Arrow Down Pressed");
+      arm.pickup();
+  }
 
-    if (dpad & DPAD_LEFT) {
-        Serial.println("Arrow Left Pressed");
-        if (arm.setClawPoint(armx-movamt,army)){
-            armx-=movamt;
-        }
-    }
+  if (dpad & DPAD_LEFT) {
+      Serial.println("Arrow Left Pressed");
+      arm.neutral();
+  }
 
-    if (dpad & DPAD_RIGHT) {
-        Serial.println("Arrow Right Pressed");
-        if (arm.setClawPoint(armx+movamt,army)){
-            armx+=movamt;
-        }
-    }
-    delay(20); // Todo make non-blocking so that drivetrain could be run at same time
-    */
-    int rawLeft = cptr->axisY();
-    int rawRight = cptr->axisRY();
+  if (dpad & DPAD_RIGHT) {
+      Serial.println("Arrow Right Pressed");
+      arm.stored();
+  }
+  if (cptr->l1()){
+    arm.setClawWrist(true);
+  } else if (cptr -> r1()){
+    arm.setClawWrist(false);
+  }
 
-    int baseVect,midVect = 0;
-    
-    if (abs(rawLeft)>50){
-      baseVect = map(rawLeft,-512,512,-movamt,movamt);
-      Serial.println(rawLeft);
-      Serial.println(baseVect);
-      if (arm.setBaseRot(baseVect+baserot)){
-        baserot = baseVect+baserot;
-        Serial.printf("baserot %d\n",baserot);
-      }
-    }
-    if (abs(rawRight)>50){
-      midVect = map(rawRight,-512,512,-movamt,movamt);
-      Serial.printf("midvect %d\n",midVect);
+  if (cptr->throttle()){
+    arm.setClawGrip(false);
+  } else if (cptr->brake()){
+    arm.setClawGrip(true);
+  }
 
-      int tmp = midVect+midrot;
-      if (arm.setMidRot(tmp)){
-        midrot = tmp;
-        Serial.printf("midrot %d\n",midrot);
-      }
-    }
-
-    delay(30);
+  lastTime = millis();
 }
 
 void processControllers(){
@@ -142,12 +119,12 @@ void processControllers(){
 
         if (cptr->isConnected() && cptr->hasData()){
             if (cptr->isGamepad()){
-                /*
+                
                 drivetrain.updateMotor(
-                    cptr->axisX(),
+                    -cptr->axisX(),
+                    -cptr->axisRX(),
                     cptr->axisY()
-                    //cptr->axisY()
-                );*/ 
+                ); 
                 updateArmPosition(cptr);
             }
         }
@@ -157,21 +134,27 @@ void processControllers(){
 
 void setup(){
     Serial.begin(115200);
-    
+    //lastTime = millis();
     BP32.setup(
             onConnectedController,
             onDisconnectedController
         );
     BP32.forgetBluetoothKeys();
   
-    /*
+    
     drivetrain.setMaxSpeed(maxSpeed);
     drivetrain.setTurnPower(turnPower);
     drivetrain.invertMotor(0,true); // invert backright
     drivetrain.invertMotor(1,true); // invert frontright
-    */
+    
+    
     arm.begin();
     arm.neutral();  
+    arm.setClawWrist(false); 
+    
+    arm.setClawOCpoint(20,200); // manully put claw servo 0 if you want to switch the claw pieces
+    arm.setClawGrip(true);
+    
 }
 
 

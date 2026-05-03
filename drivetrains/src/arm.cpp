@@ -22,9 +22,9 @@ Arm::Arm(uint8_t kbase1, uint8_t kbase2, uint8_t kmid1, uint8_t kclrot1, uint8_t
     this->kmid = kmid1;
     this->kclrot = kclrot1;
     this->kclaw = kclaw1;
-    this->totalLength = baseJointLength+upperJointLength;
-    this->baseJointVector = ((double)baseJointLength) / (baseJointLength+upperJointLength);
-    this->upperJointVector = ((double)upperJointLength) / (baseJointLength+upperJointLength);
+    this->totalLength = baseJointLength+upperJointLength+clawLength;
+    this->baseJointVector = ((double)baseJointLength) / (baseJointLength+upperJointLength+clawLength);
+    this->upperJointVector = ((double)upperJointLength+clawLength) / (baseJointLength+upperJointLength+clawLength);
     
     this->baseHeight = baseHeight;
 
@@ -41,8 +41,8 @@ void Arm::begin(){
 	ESP32PWM::allocateTimer(3);
     setupServo(kbase,kbaseidx,this->servos);
     setupServo(kmid,kmididx,this->servos);
-    //setupServo(kclrot,kclrotidx,this->servos);
-    //setupServo(kclaw,kclawidx,this->servos);
+    setupServo(kclrot,kclrotidx,this->servos);
+    setupServo(kclaw,kclawidx,this->servos);
     setupServo(kbase2, kbase2idx,this->servos);
 }
 
@@ -92,6 +92,7 @@ bool Arm::setClawPoint(int x, int y){
     double combVectorLength = sqrt(pow(xVector,2) + pow(yVector,2));
     double combVectorRadAngle = atan2(yVector,xVector); // returns -pi to +pi, -180 to 180
     Serial.printf("CombVectorRadAngle: %f\n",combVectorRadAngle);
+    if (combVectorRadAngle > 0 && combVectorRadAngle < M_PI/4) {Serial.println("can't put belo 45 deg in q1"); return false;}
     if (combVectorRadAngle > -M_PI/2 && combVectorRadAngle < 0) {Serial.println("Can't put in Q4");return false;}
     if (combVectorRadAngle < 0) combVectorRadAngle += 2*M_PI;
     double combVectorDegAngle = combVectorRadAngle*180/M_PI;
@@ -100,41 +101,6 @@ bool Arm::setClawPoint(int x, int y){
         Serial.println("Bad points\n\n");
         return false;
     }
-//------------------DIVIDE BY ZERO EDGE CASES------------------
-/*
-    if (abs(combVectorDegAngle) <= 0.5 || abs(abs(combVectorDegAngle)-180)<=0.5){ // divide by 0 edge cases
-        Serial.println("Edge case 0 deg");
-        if (x < 0 || combVectorDegAngle < 0){
-            servos[kbase2idx].write(180);
-            servos[kbaseidx].write(0);
-            servos[kmididx].write(90);
-#if ARMDEBUG
-            Serial.printf("Basejoint %d\n", 0);
-            Serial.printf("uppjoint %d\n\n", 90);
-#endif
-        } else {            
-            servos[kbase2idx].write(0);
-            servos[kbaseidx].write(180);
-            servos[kmididx].write(90);
-#if ARMDEBUG
-             Serial.printf("Basejoint %d\n", 180);
-             Serial.printf("uppjoint %d\n\n", 90);
-#endif 
-
-        }
-        return true;
-    } else if (abs(abs(combVectorDegAngle)-90)<=0.5){
-        Serial.println("Edge case 90");
-        servos[kbase2idx].write(90);
-        servos[kbaseidx].write(90);
-        servos[kmididx].write(90);
-#if ARMDEBUG
-        Serial.printf("Basejoint %d\n", 90);
-        Serial.printf("uppjoint %d\n\n", 90);
-#endif 
-        return true;
-    }
-*/
 
 #if ARMDEBUG
     Serial.println(combVectorLength);
@@ -150,10 +116,10 @@ bool Arm::setClawPoint(int x, int y){
     
 
 
-    if (baseJointRadAngle > M_PI || baseJointRadAngle < 0){
+    if (baseJointRadAngle > M_PI || baseJointRadAngle < M_PI/4){ // would put 0 istead of M_PI/4 but then the arm could hit electronics
         baseJointRadAngle = NAN;
     }
-    if (invbaseJointRadAngle > M_PI || invbaseJointRadAngle < 0){
+    if (invbaseJointRadAngle > M_PI || invbaseJointRadAngle < M_PI/4){
         invbaseJointRadAngle = NAN;
     }
 #if ARMDEBUG
@@ -206,12 +172,16 @@ void Arm::neutral(){
     servos[kmididx].write(0);
     servos[kbaseidx].write(0);
     servos[kbase2idx].write(180);
+    servos[kclawidx].write(0);
+    servos[kclrotidx].write(0);
 }
 
 void Arm::zero(){ // Dont use this when the bot is on the robot
      servos[kmididx].write(90);
      servos[kbaseidx].write(180); // Zero the servo
      servos[kbase2idx].write(0); // So that stuff doesnt get damaged
+     servos[kclawidx].write(clawOC[1]); // closed
+     servos[kclrotidx].write(0);
 }
 
 bool Arm::setServoRots(int base, int mid){
@@ -234,4 +204,27 @@ bool Arm::setMidRot(int mid){
     servos[kmididx].write(constrain(mid,0,180));
     return true;
 
+}
+
+void Arm::setClawWrist(bool down){
+    if (down){
+        servos[kclrotidx].write(90);
+    } else {
+        servos[kclrotidx].write(0);
+    }
+}
+
+void Arm::stored(){
+     servos[kmididx].write(0);
+     servos[kbaseidx].write(90); // Zero the servo
+     servos[kbase2idx].write(90); // So that stuff doesnt get damaged
+     servos[kclawidx].write(clawOC[1]); // closed
+     servos[kclrotidx].write(0);
+}
+
+void Arm::pickup(){
+     servos[kmididx].write(170);
+     servos[kbaseidx].write(45); // Zero the servo
+     servos[kbase2idx].write(135); // So that stuff doesnt get damaged
+ 
 }

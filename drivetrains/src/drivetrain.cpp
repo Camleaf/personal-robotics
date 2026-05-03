@@ -21,6 +21,7 @@ using namespace std;
 
 void setMotor(mcpwm_unit_t unit, mcpwm_timer_t timer, double val){
     float duty = (float)abs(val) * 100.0 / 255.0; //MCPWM needs 0 - 100 float
+    duty = constrain(duty,0.0,100.0);
 
     if (val > 0) {
         mcpwm_set_duty(unit, timer, MCPWM_GEN_A, duty);
@@ -183,6 +184,7 @@ void Mecanum::updateMotor(int joyX, int joyX2, int joyY){
     if (abs(x_drive) < deadzone) x_drive = 0;
     if (abs(y_drive) < deadzone) y_drive = 0;
     if (abs(turn) < deadzone) turn = 0;
+    x_drive *= 1.8;
     
     setMotor(kunitbr,MCPWM_TIMER_1,(y_drive+x_drive-turn)*invertDir[0]); //backright
     setMotor(kunitfr,MCPWM_TIMER_1,(y_drive-x_drive-turn)*invertDir[1]); //frontright
