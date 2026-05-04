@@ -184,7 +184,7 @@ void Mecanum::updateMotor(int joyX, int joyX2, int joyY){
     if (abs(x_drive) < deadzone) x_drive = 0;
     if (abs(y_drive) < deadzone) y_drive = 0;
     if (abs(turn) < deadzone) turn = 0;
-    x_drive *= 1.8;
+    x_drive *= 2;
     
     setMotor(kunitbr,MCPWM_TIMER_1,(y_drive+x_drive-turn)*invertDir[0]); //backright
     setMotor(kunitfr,MCPWM_TIMER_1,(y_drive-x_drive-turn)*invertDir[1]); //frontright

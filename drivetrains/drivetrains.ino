@@ -92,6 +92,7 @@ void updateArmPosition(ControllerPtr cptr){
   if (dpad & DPAD_LEFT) {
       Serial.println("Arrow Left Pressed");
       arm.neutral();
+      arm.setClawGrip(true);
   }
 
   if (dpad & DPAD_RIGHT) {
@@ -100,14 +101,18 @@ void updateArmPosition(ControllerPtr cptr){
   }
   if (cptr->l1()){
     arm.setClawWrist(true);
+    Serial.println("wrist down");
   } else if (cptr -> r1()){
     arm.setClawWrist(false);
+    Serial.println("wrist up");
   }
 
-  if (cptr->throttle()){
+  if (cptr->b()){
     arm.setClawGrip(false);
-  } else if (cptr->brake()){
+    Serial.println("Claw Open");
+  } else if (cptr->a()){
     arm.setClawGrip(true);
+    Serial.println("Claw Closed");
   }
 
   lastTime = millis();
