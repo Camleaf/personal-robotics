@@ -80,7 +80,7 @@ Arcade::Arcade(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t k
     this->kfl1 = kfl1;
     this->kfl2 = kfl2;
     this->deadzone = deadzone;
-
+    this->invertDir = {1,1,1,1};
     setupMCPWM(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2);
     
 }
@@ -96,9 +96,10 @@ void Arcade::setMaxSpeed(uint8_t maxSpeed){
 void Arcade::updateMotor(int joyX, int joyY){
     
     // Great source for arcade drive https://xiaoxiae.github.io/Robotics-Simplified-Website/drivetrain-control/arcade-drive/
-
+    
     joyX = map(joyX,-512,512,-turnPower,turnPower);
     joyY = map(joyY,-512,512,-maxSpeed,maxSpeed);
+    
 
     int turn = constrain(joyX,-maxSpeed,maxSpeed);
     int drive = constrain(joyY,-turnPower,turnPower);
@@ -131,12 +132,27 @@ void Arcade::updateMotor(int joyX, int joyY){
         rightSide = 0;
     }
     
-    setMotor(kunitbr,MCPWM_TIMER_1,rightSide); //backright
-    setMotor(kunitfr,MCPWM_TIMER_1,rightSide); //frontright
-    setMotor(kunitbl,MCPWM_TIMER_0,leftSide); //backleft
-    setMotor(kunitfl,MCPWM_TIMER_0,leftSide); //frontleft
+    setMotor(kunitbr,MCPWM_TIMER_1,(drive-turn)*invertDir[0]); //backright
+    setMotor(kunitfr,MCPWM_TIMER_1,(drive-turn)*invertDir[0]); //frontright
+    setMotor(kunitbl,MCPWM_TIMER_0,(drive+turn)*invertDir[2]); //backleft
+    setMotor(kunitfl,MCPWM_TIMER_0,(drive+turn)*invertDir[3]); //frontleft
+
 
 }
+
+void Arcade::invertMotor(int motor, bool inverted){
+    if (motor < 0 || motor >= 4){
+        Serial.println("Tried to invert motor greater than possible");
+        return;
+    }
+    
+    if (inverted){
+        invertDir[motor] = -1;
+        return;
+    } 
+    invertDir[motor] = 1;
+}
+
 
 
 Mecanum::Mecanum(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t kfr1, uint8_t kfr2, uint8_t kfl1, uint8_t kfl2, int deadzone){
@@ -172,7 +188,6 @@ void Mecanum::updateMotor(int joyX, int joyX2, int joyY){
     
     // Great source for mecanum drive
     //https://gm0.org/en/latest/docs/software/tutorials/mecanum-drive.html
-
     joyX = map(joyX,-512,512,-maxSpeed, maxSpeed);
     joyX2 = map(joyX2,-512,512,-turnPower,turnPower);
     joyY = map(joyY,-512,512,-maxSpeed,maxSpeed);

@@ -39,6 +39,7 @@ class Arm {
         void begin();
         void neutral();
         void zero();
+        void place();
         void stored();
         void pickup();
 

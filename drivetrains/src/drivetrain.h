@@ -12,6 +12,7 @@ class Arcade {
         void setMaxSpeed(uint8_t maxSpeed); // 0-255
         void setTurnPower(uint8_t turnPower); // 0-255
 
+        void invertMotor(int motor, bool inverted); //0 backright
         /* JoyY is for moving forward and back, JoyX is for rotation
          */ 
 
@@ -30,6 +31,7 @@ class Arcade {
         uint8_t kfl1 = 0;
         uint8_t kfl2 = 0;
         int deadzone = 40;
+        array<int,4> invertDir = {1,1,1,1};
 };
 
 

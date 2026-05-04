@@ -172,7 +172,7 @@ void Arm::neutral(){
     servos[kmididx].write(0);
     servos[kbaseidx].write(0);
     servos[kbase2idx].write(180);
-    servos[kclawidx].write(0);
+    servos[kclawidx].write(clawOC[1]);
     servos[kclrotidx].write(0);
 }
 
@@ -180,7 +180,7 @@ void Arm::zero(){ // Dont use this when the bot is on the robot
      servos[kmididx].write(90);
      servos[kbaseidx].write(180); // Zero the servo
      servos[kbase2idx].write(0); // So that stuff doesnt get damaged
-     servos[kclawidx].write(clawOC[1]); // closed
+     servos[kclawidx].write(180); // closed
      servos[kclrotidx].write(0);
 }
 
@@ -218,7 +218,7 @@ void Arm::stored(){
      servos[kmididx].write(0);
      servos[kbaseidx].write(90); // Zero the servo
      servos[kbase2idx].write(90); // So that stuff doesnt get damaged
-     servos[kclawidx].write(clawOC[1]); // closed
+     servos[kclawidx].write(180); // closed
      servos[kclrotidx].write(0);
 }
 
@@ -227,4 +227,10 @@ void Arm::pickup(){
      servos[kbaseidx].write(45); // Zero the servo
      servos[kbase2idx].write(135); // So that stuff doesnt get damaged
  
+}
+
+void Arm::place(){
+     servos[kmididx].write(180);
+     servos[kbaseidx].write(90); // Zero the servo
+     servos[kbase2idx].write(90); // So that stuff doesnt get damaged
 }

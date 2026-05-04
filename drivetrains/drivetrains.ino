@@ -6,7 +6,6 @@
 #include "ArduinoController.h"
 #include "src/drivetrain.h"
 #include "src/arm.h"
-#include "src/shooter.h"
 #include <Bluepad32.h>
 #include <cstdlib>
 
@@ -26,8 +25,8 @@
 #define kfl2 33
 
 // Misc vars
-#define maxSpeed 128
-#define turnPower 128
+#define maxSpeed 140
+#define turnPower 140
 
 //// Arm
 #define kbase1 18
@@ -81,7 +80,7 @@ void updateArmPosition(ControllerPtr cptr){
   uint8_t dpad = cptr->dpad();
   if (dpad & DPAD_UP) {
       Serial.println("Arrow Up Pressed");
-      
+      arm.place();
   }
   
   if (dpad & DPAD_DOWN) {
@@ -126,8 +125,8 @@ void processControllers(){
             if (cptr->isGamepad()){
                 
                 drivetrain.updateMotor(
-                    -cptr->axisX(),
-                    cptr->axisY()
+                    cptr->axisY(),
+                    -cptr->axisRX()
                 ); 
                 updateArmPosition(cptr);
             }
@@ -148,12 +147,12 @@ void setup(){
     
     drivetrain.setMaxSpeed(maxSpeed);
     drivetrain.setTurnPower(turnPower); 
-    
+
     arm.begin();
     arm.neutral();  
     arm.setClawWrist(false); 
     
-    arm.setClawOCpoint(20,200); // manully put claw servo 0 if you want to switch the claw pieces
+    arm.setClawOCpoint(20,180); // manully put claw servo 0 if you want to switch the claw pieces
     arm.setClawGrip(true);
     
 }
