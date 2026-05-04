@@ -43,7 +43,7 @@ const int baseHeight = 40; // mm
 
 
 
-Mecanum drivetrain(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2);
+Arcade drivetrain(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2);
 Arm arm(kbase1,kbase2,kmid1,kclrot1,kclaw1,baseJointLength,upperJointLength,clawLength,baseHeight);
 
 
@@ -127,7 +127,6 @@ void processControllers(){
                 
                 drivetrain.updateMotor(
                     -cptr->axisX(),
-                    -cptr->axisRX(),
                     cptr->axisY()
                 ); 
                 updateArmPosition(cptr);
@@ -148,10 +147,7 @@ void setup(){
   
     
     drivetrain.setMaxSpeed(maxSpeed);
-    drivetrain.setTurnPower(turnPower);
-    drivetrain.invertMotor(0,true); // invert backright
-    drivetrain.invertMotor(1,true); // invert frontright
-    
+    drivetrain.setTurnPower(turnPower); 
     
     arm.begin();
     arm.neutral();  
