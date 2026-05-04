@@ -27,7 +27,7 @@ uint32_t colList[] = {
 int idx = 0;
 void loop(){
      
-    delay(300);
+    delay(500);
     for (int i = 0; i<LED_COUNT;i++){
       px.setPixelColor(i,colList[idx]);
       delay(100);
