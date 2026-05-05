@@ -51,15 +51,18 @@ Arm arm(kbase1,kbase2,kmid1,kclrot1,kclaw1,baseJointLength,upperJointLength,claw
 ControllerPtr contr[BP32_MAX_CONTROLLERS];
 
 void onConnectedController(ControllerPtr cptr) {
+    if (!cptr) return;
     for (int i = 0; i < BP32_MAX_CONTROLLERS; i++){
         if (contr[i] == nullptr) {
             contr[i] = cptr;
+            Serial.println("add successfull");
             return;
         }
     }
 }
 
-void onDisconnectedController(ControllerPtr cptr) {    
+void onDisconnectedController(ControllerPtr cptr) {   
+    if (!cptr) return;
     for (int i = 0; i < BP32_MAX_CONTROLLERS; i++){
         if (contr[i] == cptr) {
             contr[i] = nullptr;
@@ -136,13 +139,17 @@ void processControllers(){
 }
 
 void setup(){
+    for (int i = 0; i < BP32_MAX_CONTROLLERS; i++) {
+      contr[i] = nullptr;
+    }
     Serial.begin(115200);
     //lastTime = millis();
+    
+    BP32.forgetBluetoothKeys();
     BP32.setup(
             onConnectedController,
             onDisconnectedController
         );
-    BP32.forgetBluetoothKeys();
   
     
     drivetrain.setMaxSpeed(maxSpeed);
@@ -154,7 +161,6 @@ void setup(){
     
     arm.setClawOCpoint(20,180); // manully put claw servo 0 if you want to switch the claw pieces
     arm.setClawGrip(true);
-    
 }
 
 
