@@ -128,8 +128,8 @@ void processControllers(){
             if (cptr->isGamepad()){
                 
                 drivetrain.updateMotor(
-                    cptr->axisY(),
-                    -cptr->axisRX()
+                    cptr->axisRX(),
+                    cptr->axisY()
                 ); 
                 updateArmPosition(cptr);
             }

@@ -99,7 +99,6 @@ void Arcade::updateMotor(int joyX, int joyY){
     
     joyX = map(joyX,-512,512,-turnPower,turnPower);
     joyY = map(joyY,-512,512,-maxSpeed,maxSpeed);
-    
 
     int turn = constrain(joyX,-maxSpeed,maxSpeed);
     int drive = constrain(joyY,-turnPower,turnPower);
@@ -131,13 +130,11 @@ void Arcade::updateMotor(int joyX, int joyY){
         leftSide = 0;
         rightSide = 0;
     }
-    
-    setMotor(kunitbr,MCPWM_TIMER_1,(drive-turn)*invertDir[0]); //backright
-    setMotor(kunitfr,MCPWM_TIMER_1,(drive-turn)*invertDir[0]); //frontright
-    setMotor(kunitbl,MCPWM_TIMER_0,(drive+turn)*invertDir[2]); //backleft
-    setMotor(kunitfl,MCPWM_TIMER_0,(drive+turn)*invertDir[3]); //frontleft
 
-
+    setMotor(kunitbr,MCPWM_TIMER_1,rightSide*invertDir[0]); //backright
+    setMotor(kunitfr,MCPWM_TIMER_1,rightSide*invertDir[1]); //frontright
+    setMotor(kunitbl,MCPWM_TIMER_0,leftSide*invertDir[2]); //backleft
+    setMotor(kunitfl,MCPWM_TIMER_0,leftSide*invertDir[3]); //frontleft
 }
 
 void Arcade::invertMotor(int motor, bool inverted){
