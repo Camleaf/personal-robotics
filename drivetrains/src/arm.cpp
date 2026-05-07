@@ -208,9 +208,9 @@ bool Arm::setMidRot(int mid){
 
 void Arm::setClawWrist(bool down){
     if (down){
-        servos[kclrotidx].write(90);
+        servos[kclrotidx].write(30);
     } else {
-        servos[kclrotidx].write(0);
+        servos[kclrotidx].write(110);
     }
 }
 

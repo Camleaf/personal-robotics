@@ -99,6 +99,16 @@ void Arcade::updateMotor(int joyX, int joyY){
     
     joyX = map(joyX,-512,512,-turnPower,turnPower);
     joyY = map(joyY,-512,512,-maxSpeed,maxSpeed);
+#if DEBUG
+    Serial.println(joyY);
+    Serial.println(joyX);
+#endif
+
+    if (abs(joyX) <= deadzone){
+        joyX = 0;    
+    } if (abs(joyY) <= deadzone){
+        joyY = 0;
+    }
 
     int turn = constrain(joyX,-maxSpeed,maxSpeed);
     int drive = constrain(joyY,-turnPower,turnPower);
@@ -107,30 +117,16 @@ void Arcade::updateMotor(int joyX, int joyY){
     int total = drive + turn;
     int difference = drive - turn;
 
-    int rightSide;
-    int leftSide;
+    int leftSide  = drive + turn;
+    int rightSide = drive - turn;
 
-    if (drive >= deadzone){
-        if (turn >= deadzone){ // q1
-            leftSide = maximum;
-            rightSide = difference;
-        } else { 
-            leftSide = total;
-            rightSide = maximum;
-        }
-    } else if (drive <= -deadzone) {
-        if (turn >= deadzone){
-            leftSide = total;
-            rightSide = -maximum;
-        } else { 
-            leftSide = -maximum;
-            rightSide = difference;
-        }
-    } else {
-        leftSide = 0;
-        rightSide = 0;
-    }
-
+    leftSide = constrain(leftSide, -255, 255);
+    rightSide = constrain(rightSide, -255, 255);    
+#if DEBUG
+    Serial.println(leftSide);
+    Serial.println(rightSide);
+    Serial.println("");
+    #endif
     setMotor(kunitbr,MCPWM_TIMER_1,rightSide*invertDir[0]); //backright
     setMotor(kunitfr,MCPWM_TIMER_1,rightSide*invertDir[1]); //frontright
     setMotor(kunitbl,MCPWM_TIMER_0,leftSide*invertDir[2]); //backleft

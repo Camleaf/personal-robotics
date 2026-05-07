@@ -25,8 +25,8 @@
 #define kfl2 33
 
 // Misc vars
-#define maxSpeed 140
-#define turnPower 140
+#define maxSpeed 180
+#define turnPower 180
 
 //// Arm
 #define kbase1 18
@@ -128,8 +128,8 @@ void processControllers(){
             if (cptr->isGamepad()){
                 
                 drivetrain.updateMotor(
-                    cptr->axisRX(),
-                    cptr->axisY()
+                    cptr->axisY(),
+                    -cptr->axisRX()
                 ); 
                 updateArmPosition(cptr);
             }
@@ -145,7 +145,7 @@ void setup(){
     Serial.begin(115200);
     //lastTime = millis();
     
-    BP32.forgetBluetoothKeys();
+    //BP32.forgetBluetoothKeys();
     BP32.setup(
             onConnectedController,
             onDisconnectedController
@@ -156,11 +156,13 @@ void setup(){
     drivetrain.setTurnPower(turnPower); 
 
     arm.begin();
-    arm.neutral();  
+    arm.neutral();
+    
     arm.setClawWrist(false); 
     
     arm.setClawOCpoint(20,180); // manully put claw servo 0 if you want to switch the claw pieces
     arm.setClawGrip(true);
+    //arm.servos[kclawidx].write(0); only when changing claw
 }
 
 
