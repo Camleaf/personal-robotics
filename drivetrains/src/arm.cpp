@@ -219,18 +219,31 @@ void Arm::stored(){
      servos[kbaseidx].write(90); // Zero the servo
      servos[kbase2idx].write(90); // So that stuff doesnt get damaged
      servos[kclawidx].write(180); // closed
-     servos[kclrotidx].write(0);
+     servos[kclrotidx].write(30);
 }
 
 void Arm::pickup(){
      servos[kmididx].write(170);
      servos[kbaseidx].write(45); // Zero the servo
      servos[kbase2idx].write(135); // So that stuff doesnt get damaged
- 
+}
+
+void Arm::ringpickup(){
+    servos[kmididx].write(130);
+    servos[kbaseidx].write(0);
+    servos[kbase2idx].write(180);
 }
 
 void Arm::place(){
-     servos[kmididx].write(180);
-     servos[kbaseidx].write(90); // Zero the servo
-     servos[kbase2idx].write(90); // So that stuff doesnt get damaged
+     servos[kmididx].write(90);
+     servos[kbaseidx].write(0); // Zearo the servo
+     servos[kbase2idx].write(180); // So that stuff doesnt get damaged
 }
+
+void Arm::score(){
+    servos[kmididx].write(90);
+    servos[kbaseidx].write(70);
+    servos[kbase2idx].write(100);
+}
+
+

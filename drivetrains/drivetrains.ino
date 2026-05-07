@@ -25,8 +25,8 @@
 #define kfl2 33
 
 // Misc vars
-#define maxSpeed 180
-#define turnPower 180
+#define maxSpeed 140
+#define turnPower 140
 
 //// Arm
 #define kbase1 18
@@ -77,7 +77,7 @@ int baserot = 0;
 int midrot = 0;
 int lastTime;
 void updateArmPosition(ControllerPtr cptr){
-  if (millis()-lastTime < 500){
+  if (millis()-lastTime < 200){
     return;
   }
   uint8_t dpad = cptr->dpad();
@@ -86,20 +86,26 @@ void updateArmPosition(ControllerPtr cptr){
       arm.place();
   }
   
-  if (dpad & DPAD_DOWN) {
+  else if (dpad & DPAD_DOWN) {
       Serial.println("Arrow Down Pressed");
       arm.pickup();
   }
 
-  if (dpad & DPAD_LEFT) {
+  else if (dpad & DPAD_LEFT) {
       Serial.println("Arrow Left Pressed");
       arm.neutral();
       arm.setClawGrip(true);
   }
 
-  if (dpad & DPAD_RIGHT) {
+  else if (dpad & DPAD_RIGHT) {
       Serial.println("Arrow Right Pressed");
       arm.stored();
+  } else if (cptr->y()){
+    Serial.println("scoring");
+    arm.score();
+  } else if (cptr->x()){
+    Serial.println("pickup");
+    arm.ringpickup();
   }
   if (cptr->l1()){
     arm.setClawWrist(true);
@@ -108,6 +114,8 @@ void updateArmPosition(ControllerPtr cptr){
     arm.setClawWrist(false);
     Serial.println("wrist up");
   }
+  
+
 
   if (cptr->b()){
     arm.setClawGrip(false);
@@ -162,7 +170,7 @@ void setup(){
     
     arm.setClawOCpoint(20,180); // manully put claw servo 0 if you want to switch the claw pieces
     arm.setClawGrip(true);
-    //arm.servos[kclawidx].write(0); only when changing claw
+    arm.servos[kclawidx].write(0); // only when changing claw
 }
 
 

@@ -42,6 +42,8 @@ class Arm {
         void place();
         void stored();
         void pickup();
+        void score();
+        void ringpickup();
 
     array<Servo,5> servos;
         
