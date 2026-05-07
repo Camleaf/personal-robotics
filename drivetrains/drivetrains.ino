@@ -128,6 +128,7 @@ void updateArmPosition(ControllerPtr cptr){
   lastTime = millis();
 }
 
+bool slowmode = false;
 void processControllers(){
     for (auto cptr: contr) {
         if (!cptr) continue;
@@ -137,9 +138,17 @@ void processControllers(){
                 
                 drivetrain.updateMotor(
                     cptr->axisY(),
-                    -cptr->axisRX()
+                    -cptr->axisRX(),
+                    slowmode
                 ); 
                 updateArmPosition(cptr);
+
+                if (cptr->r2()){
+                    slowmode = true;
+                    Serial.println("slowmode on");
+                } else {
+                    slowmode = false;
+                }
             }
         }
 

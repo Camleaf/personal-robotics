@@ -19,7 +19,7 @@ class Arcade {
         /* JoyY is for moving forward and back, JoyX is for rotation
          */ 
 
-        void updateMotor(int joyX, int joyY); // Must be in range (-512,512)
+        void updateMotor(int joyX, int joyY, bool slowmode); // Must be in range (-512,512)
         // settings
         uint8_t maxSpeed = 255;
         uint8_t turnPower = 255;

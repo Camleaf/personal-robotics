@@ -210,7 +210,7 @@ void Arm::setClawWrist(bool down){
     if (down){
         servos[kclrotidx].write(30);
     } else {
-        servos[kclrotidx].write(110);
+        servos[kclrotidx].write(120);
     }
 }
 
@@ -242,8 +242,8 @@ void Arm::place(){
 
 void Arm::score(){
     servos[kmididx].write(90);
-    servos[kbaseidx].write(70);
-    servos[kbase2idx].write(100);
+    servos[kbaseidx].write(60);
+    servos[kbase2idx].write(120);
 }
 
 
