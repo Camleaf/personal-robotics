@@ -30,7 +30,7 @@ Arm::Arm(uint8_t kbase1, uint8_t kbase2, uint8_t kmid1, uint8_t kclrot1, uint8_t
 
     this->baseJointRange ={0,120}; //defaults
     this->midJointRange={20,160}; //defaults
-    this->clawOC={0,180}; //defaults 
+    this->clawOC={0,140}; //defaults 
 }
 
 void Arm::begin(){
@@ -91,7 +91,6 @@ bool Arm::setClawPoint(int x, int y){
     }
     double combVectorLength = sqrt(pow(xVector,2) + pow(yVector,2));
     double combVectorRadAngle = atan2(yVector,xVector); // returns -pi to +pi, -180 to 180
-    Serial.printf("CombVectorRadAngle: %f\n",combVectorRadAngle);
     if (combVectorRadAngle > 0 && combVectorRadAngle < M_PI/4) {Serial.println("can't put belo 45 deg in q1"); return false;}
     if (combVectorRadAngle > -M_PI/2 && combVectorRadAngle < 0) {Serial.println("Can't put in Q4");return false;}
     if (combVectorRadAngle < 0) combVectorRadAngle += 2*M_PI;
@@ -180,7 +179,7 @@ void Arm::zero(){ // Dont use this when the bot is on the robot
      servos[kmididx].write(90);
      servos[kbaseidx].write(180); // Zero the servo
      servos[kbase2idx].write(0); // So that stuff doesnt get damaged
-     servos[kclawidx].write(180); // closed
+     servos[kclawidx].write(clawOC[1]); // closed
      servos[kclrotidx].write(0);
 }
 
@@ -218,7 +217,6 @@ void Arm::stored(){
      servos[kmididx].write(0);
      servos[kbaseidx].write(90); // Zero the servo
      servos[kbase2idx].write(90); // So that stuff doesnt get damaged
-     servos[kclawidx].write(180); // closed
      servos[kclrotidx].write(30);
 }
 
@@ -229,7 +227,7 @@ void Arm::pickup(){
 }
 
 void Arm::ringpickup(){
-    servos[kmididx].write(130);
+    servos[kmididx].write(120);
     servos[kbaseidx].write(0);
     servos[kbase2idx].write(180);
 }

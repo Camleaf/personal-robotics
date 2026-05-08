@@ -93,7 +93,7 @@ void Arcade::setMaxSpeed(uint8_t maxSpeed){
     this->maxSpeed = maxSpeed;
 }
 
-void Arcade::updateMotor(int joyX, int joyY, bool slowmode){
+void Arcade::updateMotor(int joyX, int joyY, bool slowmode, bool boost){
     
     // Great source for arcade drive https://xiaoxiae.github.io/Robotics-Simplified-Website/drivetrain-control/arcade-drive/
     
@@ -126,6 +126,12 @@ void Arcade::updateMotor(int joyX, int joyY, bool slowmode){
     if (slowmode){
         leftSide/=4;
         rightSide/=4;
+    } else if (boost) {
+        leftSide *= 1.8;
+        rightSide *= 1.8;
+        leftSide = constrain(leftSide, -255, 255);
+        rightSide = constrain(rightSide, -255, 255);    
+    
     }
 
 

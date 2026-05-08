@@ -82,53 +82,44 @@ void updateArmPosition(ControllerPtr cptr){
   }
   uint8_t dpad = cptr->dpad();
   if (dpad & DPAD_UP) {
-      Serial.println("Arrow Up Pressed");
       arm.place();
   }
   
   else if (dpad & DPAD_DOWN) {
-      Serial.println("Arrow Down Pressed");
       arm.pickup();
   }
 
   else if (dpad & DPAD_LEFT) {
-      Serial.println("Arrow Left Pressed");
       arm.neutral();
       arm.setClawGrip(true);
   }
 
   else if (dpad & DPAD_RIGHT) {
-      Serial.println("Arrow Right Pressed");
       arm.stored();
   } else if (cptr->y()){
-    Serial.println("scoring");
     arm.score();
   } else if (cptr->x()){
-    Serial.println("pickup");
     arm.ringpickup();
   }
   if (cptr->l1()){
     arm.setClawWrist(true);
-    Serial.println("wrist down");
   } else if (cptr -> r1()){
     arm.setClawWrist(false);
-    Serial.println("wrist up");
   }
   
 
 
   if (cptr->b()){
     arm.setClawGrip(false);
-    Serial.println("Claw Open");
   } else if (cptr->a()){
     arm.setClawGrip(true);
-    Serial.println("Claw Closed");
   }
 
   lastTime = millis();
 }
 
 bool slowmode = false;
+bool boost = false;
 void processControllers(){
     for (auto cptr: contr) {
         if (!cptr) continue;
@@ -139,14 +130,19 @@ void processControllers(){
                 drivetrain.updateMotor(
                     cptr->axisY(),
                     -cptr->axisRX(),
-                    slowmode
+                    slowmode,
+                    boost
                 ); 
                 updateArmPosition(cptr);
 
                 if (cptr->r2()){
                     slowmode = true;
-                    Serial.println("slowmode on");
+                    boost = false;
+                } else if (cptr->l2()){
+                    boost = true;
+                    slowmode = false;
                 } else {
+                    boost = false;  
                     slowmode = false;
                 }
             }
@@ -177,7 +173,7 @@ void setup(){
     
     arm.setClawWrist(false); 
     
-    arm.setClawOCpoint(20,180); // manully put claw servo 0 if you want to switch the claw pieces
+    arm.setClawOCpoint(30,120); // manully put claw servo 0 if you want to switch the claw pieces
     arm.setClawGrip(true);
     arm.servos[kclawidx].write(0); // only when changing claw
 }
