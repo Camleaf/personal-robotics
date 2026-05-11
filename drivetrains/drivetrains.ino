@@ -158,7 +158,6 @@ void setup(){
     Serial.begin(115200);
     //lastTime = millis();
     
-    //BP32.forgetBluetoothKeys();
     BP32.setup(
             onConnectedController,
             onDisconnectedController

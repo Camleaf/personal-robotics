@@ -30,7 +30,7 @@ Arm::Arm(uint8_t kbase1, uint8_t kbase2, uint8_t kmid1, uint8_t kclrot1, uint8_t
 
     this->baseJointRange ={0,120}; //defaults
     this->midJointRange={20,160}; //defaults
-    this->clawOC={0,140}; //defaults 
+    this->clawOC={0,180}; //defaults 
 }
 
 void Arm::begin(){
