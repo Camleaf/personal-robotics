@@ -1,21 +1,20 @@
 #include "Arduino.h"
 
 
-#define beamin A0
+#define beamin 6
 
 void setup() {
-  Serial.begin(115200);
   pinMode(beamin,INPUT);
   pinMode(13,OUTPUT);
   digitalWrite(13,LOW);
 }
 
 void loop() {
-    int in = analogRead(beamin);
-    Serial.println(in);
+    bool in = digitalRead(beamin);
 
-    if (in == 1023){digitalWrite(13,HIGH);}
-    else {
+    if (in){
+      digitalWrite(13,HIGH);
+    } else {
       digitalWrite(13,LOW);
     }
 
