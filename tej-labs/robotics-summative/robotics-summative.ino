@@ -69,7 +69,7 @@ void processControllers(){
                 drivetrain.updateMotor(
                     cptr->axisX(),
                     cptr->axisRX(),
-                    cptr->axisY()
+                    -cptr->axisY()
                 ); 
             }
         }
@@ -89,9 +89,12 @@ void setup(){
             onDisconnectedController
         );
   
-    
+     
     drivetrain.setMaxSpeed(maxSpeed);
     drivetrain.setTurnPower(turnPower); 
+
+    drivetrain.invertMotor(2,true);
+    drivetrain.invertMotor(1,true);
 
 }
 
