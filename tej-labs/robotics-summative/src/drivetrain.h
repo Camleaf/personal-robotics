@@ -39,4 +39,13 @@ class Mecanum {
 };
 
 
+class OrientationProvider {
+    public:
+        OrientationProvider();
+        virtual float get();
+        virtual void generate_tuned_values();
+        virtual void fetch_values(uint32_t timestamp); 
+};
+
+
 #endif
