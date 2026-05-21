@@ -1,9 +1,10 @@
 #include <Adafruit_MPU6050.h>
 #include "./mpu6050.h"
 
-Adafruit_MPU6050 mpu;
 
-void create_odometry(){
+OrientStore::OrientStore(){
+    mpu = Adafruit_MPU6050();
+    
 
     if (!mpu.begin()) {
         Serial.println("Failed to find MPU6050 chip");
@@ -23,8 +24,8 @@ void create_odometry(){
   
     Serial.print("gyro: ");
     Serial.println(mpu.getGyroRange());
-
-    
+    yaw = 0;
+    lastTime = 0;
 }
 
 
@@ -40,10 +41,10 @@ double findMax(double num1, double num2){
 const int tuningCycles = 1000;
 void OrientStore::create_threshold_values(){
     /* Must be flat and still for accurate resting threshold data*/
-    double minRestingMagA, maxRestingMagA, thresholdA;
-    double minGZ, maxGZ, thresholdGZ;
+    float minRestingMagA, maxRestingMagA, thresholdA;
+    float minGZ, maxGZ, thresholdGZ;
 
-    double avgMagA, avgGZ;
+    float avgMagA, avgGZ;
 
     for (int i = 0;i<tuningCycles;i++){
         
@@ -84,4 +85,31 @@ void OrientStore::create_threshold_values(){
     Serial.print("Max: ");
     Serial.println(maxRestingMagA);
 
+    this->minAccelResting = minRestingMagA;
+    this->maxAccelResting = maxAccelResting;
+    this->accelMagVariance = thresholdA;
+    this->accelHardBias = avgMagA / tuningCycles;
+    this->yawVariance = thresholdGZ;
+    this->yawHardBias = avgGZ / tuningCycles;
+
+}
+
+void OrientStore::fetch_data(uint32_t timestamp){ // use esp timer to get this to be accurate
+    if (lastTime == 0){
+        lastTime = timestamp;
+        return;
+    }
+    
+    uint32_t delta = (lastTime - timestamp) /1000000.0f;
+    sensors_event_t a, g, temp;
+    mpu.getEvent(&a, &g, &temp);
+    
+    yaw += g.acceleration.heading * delta;
+    
+    lastTime = timestamp;
+}
+
+
+float OrientStore::get(){
+    return this->yaw;
 }

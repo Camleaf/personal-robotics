@@ -5,10 +5,10 @@
 
 #include "ArduinoController.h"
 #include "src/drivetrain.h"
+#include "src/mpu6050.h"
 #include <Bluepad32.h>
 #include <cstdlib>
 
-// use gpios 4-18, 21, 38, 39, 40, 41, 42, 47,48 for pwm
 //// drivetrain
 // Back right
 #define kbr1 12
@@ -17,7 +17,7 @@
 #define kbl1 25
 #define kbl2 26
 // Front right
-#define kfr1 22
+#define kfr1 22 // switch this because it intersects with sda
 #define kfr2 23
 // Front left
 #define kfl1 18
@@ -31,7 +31,7 @@
 
 
 Mecanum drivetrain(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2);
-
+OrientStore orientStore; // reserve the sda and scl pins. 21 SDA, 22 SCL
 
 
 
@@ -82,7 +82,6 @@ void setup(){
       contr[i] = nullptr;
     }
     Serial.begin(115200);
-    //lastTime = millis();
     
     BP32.setup(
             onConnectedController,
@@ -96,11 +95,12 @@ void setup(){
     drivetrain.invertMotor(2,true);
     drivetrain.invertMotor(1,true);
 
+    orientStore.create_threshold_values();
 }
 
 
 void loop(){
-    
+    orientStore.fetch_data(esp_timer_get_time());   
     if (BP32.update()){
         processControllers();
     }
