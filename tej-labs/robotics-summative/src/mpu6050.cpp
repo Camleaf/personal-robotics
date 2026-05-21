@@ -1,6 +1,5 @@
 #include <Adafruit_MPU6050.h>
-#include "./drivetrain.h"
-
+#include "./mpu6050.h"
 
 Adafruit_MPU6050 mpu;
 
@@ -39,7 +38,7 @@ double findMax(double num1, double num2){
 }
 
 const int tuningCycles = 1000;
-void create_threshold_values(){
+void OrientStore::create_threshold_values(){
     /* Must be flat and still for accurate resting threshold data*/
     double minRestingMagA, maxRestingMagA, thresholdA;
     double minGZ, maxGZ, thresholdGZ;
