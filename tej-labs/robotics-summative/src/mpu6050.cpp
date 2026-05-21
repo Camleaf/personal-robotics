@@ -1,10 +1,11 @@
+#include <Wire.h>
 #include <Adafruit_MPU6050.h>
 #include "./mpu6050.h"
 
 
 OrientStore::OrientStore(){
+    Wire.begin(21,22); // SDA and SCL
     mpu = Adafruit_MPU6050();
-    
 
     if (!mpu.begin()) {
         Serial.println("Failed to find MPU6050 chip");
@@ -26,6 +27,7 @@ OrientStore::OrientStore(){
     Serial.println(mpu.getGyroRange());
     yaw = 0;
     lastTime = 0;
+
 }
 
 

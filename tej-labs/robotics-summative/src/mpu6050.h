@@ -17,7 +17,8 @@ class OrientStore {
     private:
         Adafruit_MPU6050 mpu; 
         static constexpr float bias_filter_pass = 0.5f;
-
+        
+        // add hardcoded values for threshold stuff just as default In case I don't feel like recalibrating each boot
         float yawVariance = 0.f;
         float accelMagVariance = 0.f;
         
