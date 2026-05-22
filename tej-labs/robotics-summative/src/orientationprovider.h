@@ -8,6 +8,7 @@
 class OrientationProvider {
     public:
         virtual float get() = 0;
+        virtual float getRadians() = 0;
         virtual void generate_tuned_values() = 0;
         virtual void fetch_data(uint32_t timestamp) = 0; 
 };
@@ -21,6 +22,7 @@ class Magnetometer: public OrientationProvider{
         void generate_tuned_values() override;
         void fetch_data(uint32_t timestamp) override;
         float get() override; 
+        float getRadians() override;
 
     private:
        
@@ -45,6 +47,7 @@ class  GyroMPU6050: public OrientationProvider{
         
         void fetch_data(uint32_t timestamp) override;
         float get() override;
+        float getRadians() override;
 
     private:
         Adafruit_MPU6050 mpu; 

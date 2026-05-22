@@ -20,9 +20,9 @@ using namespace std;
 #define ktime1 MCPWM_TIMER_0
 #define ktime2 MCPWM_TIMER_1
 
-void setMotor(mcpwm_unit_t unit, mcpwm_timer_t timer, double val){
-    float duty = (float)abs(val) * 100.0 / 255.0; //MCPWM needs 0 - 100 float
-    duty = constrain(duty,0.0,100.0);
+void setMotor(mcpwm_unit_t unit, mcpwm_timer_t timer, float val){
+    float duty = abs(val) * 100.0f / 255.0f; //MCPWM needs 0 - 100 float
+    duty = constrain(duty,0.0f,100.0f);
 
     if (val > 0) {
         mcpwm_set_duty(unit, timer, MCPWM_GEN_A, duty);
@@ -130,14 +130,14 @@ void Mecanum::updateMotor(int joyX, int joyX2, int joyY, int joyY2){
     joyX2 = map(joyX2,-512,512,-turnPower,turnPower);
     joyY = map(joyY,-512,512,-maxSpeed,maxSpeed);
     
-    int x_drive = constrain(joyX,-maxSpeed,maxSpeed); // horizontal drive
-    int y_drive = constrain(joyY,-maxSpeed,maxSpeed); // standard drive
-    int turn = constrain(joyX2,-turnPower,turnPower);
+    float x_drive = constrain(joyX,-maxSpeed,maxSpeed); // horizontal drive
+    float y_drive = constrain(joyY,-maxSpeed,maxSpeed); // standard drive
+    float turn = constrain(joyX2,-turnPower,turnPower);
     
     if (abs(x_drive) < deadzone) x_drive = 0;
     if (abs(y_drive) < deadzone) y_drive = 0;
     if (abs(turn) < deadzone) turn = 0;
-    x_drive *= 1.5;
+    x_drive *= 1.5f;
     
     setMotor(kunitbr,MCPWM_TIMER_1,(y_drive+x_drive-turn)*invertDir[0]); //backright
     setMotor(kunitfr,MCPWM_TIMER_1,(y_drive-x_drive-turn)*invertDir[1]); //frontright
@@ -158,6 +158,31 @@ FieldMecanum::FieldMecanum(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl
 
 
 void FieldMecanum::updateMotor(int joyX, int joyX2, int joyY, int joyY2){
-    //to implement
+    
+    // Great source for mecanum drive
+    //https://gm0.org/en/latest/docs/software/tutorials/mecanum-drive.html
+    
+    if (abs(joyX) < deadzone) joyX = 0;
+    if (abs(joyY) < deadzone) joyY = 0;
+    if (abs(joyX2) < deadzone) joyX2 = 0;
+
+    joyX = map(joyX,-512,512,-maxSpeed, maxSpeed);
+    joyX2 = map(joyX2,-512,512,-turnPower,turnPower);
+    joyY = map(joyY,-512,512,-maxSpeed,maxSpeed);
+
+    float botHeading = orientProvider->getRadians();
+
+    int x_drive = constrain(joyX,-maxSpeed,maxSpeed); // horizontal drive
+    int y_drive = constrain(joyY,-maxSpeed,maxSpeed); // standard drive
+    int turn = constrain(joyX2,-turnPower,turnPower); 
+    x_drive *= 1.4f;
+
+    float rot_x_drive = x_drive * cosf(-botHeading) - y_drive * sinf(-botHeading);
+    float rot_y_drive = x_drive * sinf(-botHeading) + y_drive * cosf(-botHeading);
+    
+    setMotor(kunitbr,MCPWM_TIMER_1,(rot_y_drive+rot_x_drive-turn)*invertDir[0]); //backright
+    setMotor(kunitfr,MCPWM_TIMER_1,(rot_y_drive-rot_x_drive-turn)*invertDir[1]); //frontright
+    setMotor(kunitbl,MCPWM_TIMER_0,(rot_y_drive-rot_x_drive+turn)*invertDir[2]); //backleft
+    setMotor(kunitfl,MCPWM_TIMER_0,(rot_y_drive+rot_x_drive+turn)*invertDir[3]); //frontleft
 }
 

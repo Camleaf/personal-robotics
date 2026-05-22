@@ -114,3 +114,7 @@ void GyroMPU6050::fetch_data(uint32_t timestamp){ // use esp timer to get this t
 float GyroMPU6050::get(){
     return this->yaw;
 }
+
+float GyroMPU6050::getRadians(){
+    return this->yaw * (M_PI/180.f);
+}

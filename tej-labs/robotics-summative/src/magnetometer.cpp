@@ -15,5 +15,10 @@ void Magnetometer::fetch_data(uint32_t timestamp){
 }
 
 float Magnetometer::get(){
-    return this->yaw;
+    return this->yaw;// ADJUST IF MAGNETOMETER GIVES IN RADIANS OR DEGREES 
+}
+
+
+float Magnetometer::getRadians(){
+    return this->yaw; // ADJUST IF MAGNETOMETER GIVES IN RADIANS OR DEGREES
 }
