@@ -3,7 +3,7 @@
 #include "./mpu6050.h"
 
 
-OrientStore::OrientStore(){
+GyroMPU6050::GyroMPU6050(){
     Wire.begin(21,22); // SDA and SCL
     mpu = Adafruit_MPU6050();
 
@@ -41,7 +41,7 @@ double findMax(double num1, double num2){
 }
 
 const int tuningCycles = 1000;
-void OrientStore::create_threshold_values(){
+void GyroMPU6050::generate_tuned_values(){
     /* Must be flat and still for accurate resting threshold data*/
     float minRestingMagA, maxRestingMagA, thresholdA;
     float minGZ, maxGZ, thresholdGZ;
@@ -96,7 +96,7 @@ void OrientStore::create_threshold_values(){
 
 }
 
-void OrientStore::fetch_data(uint32_t timestamp){ // use esp timer to get this to be accurate
+void GyroMPU6050::fetch_data(uint32_t timestamp){ // use esp timer to get this to be accurate
     if (lastTime == 0){
         lastTime = timestamp;
         return;
@@ -112,6 +112,6 @@ void OrientStore::fetch_data(uint32_t timestamp){ // use esp timer to get this t
 }
 
 
-float OrientStore::get(){
+float GyroMPU6050::get(){
     return this->yaw;
 }

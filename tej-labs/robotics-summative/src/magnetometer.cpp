@@ -2,18 +2,18 @@
 #include "Wire.h"
 
 
-MagnetometerStore::MagnetometerStore(){
+Magnetometer::Magnetometer(){
     // Initialize library for magnetometer    
 }
 
-void MagnetometerStore::generate_tuned_values(){
+void Magnetometer::generate_tuned_values(){
     
 }
 
-void MagnetometerStore::fetch_data(uint32_t timestamp){
+void Magnetometer::fetch_data(uint32_t timestamp){
     
 }
 
-float MagnetometerStore::get(){
+float Magnetometer::get(){
     return this->yaw;
 }

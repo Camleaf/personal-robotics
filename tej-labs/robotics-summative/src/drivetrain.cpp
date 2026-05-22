@@ -68,9 +68,7 @@ void setupMCPWM(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t 
 
 
 
-
-Mecanum::Mecanum(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t kfr1, uint8_t kfr2, uint8_t kfl1, uint8_t kfl2, int deadzone){
-    
+Drivetrain::Drivetrain(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t kfr1, uint8_t kfr2, uint8_t kfl1, uint8_t kfl2, int deadzone){
     this->maxSpeed = 255;
     this->turnPower = 255;
         
@@ -90,15 +88,36 @@ Mecanum::Mecanum(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t
 
 
 
-void Mecanum::setTurnPower(uint8_t turnPower){
+
+void Drivetrain::invertMotor(int motor, bool inverted){
+    if (motor < 0 || motor >= 4){
+        Serial.println("Tried to invert motor greater than possible");
+        return;
+    }
+    
+    if (inverted){
+        invertDir[motor] = -1;
+        return;
+    } 
+    invertDir[motor] = 1;
+}
+
+
+void Drivetrain::setTurnPower(uint8_t turnPower){
     this->turnPower = turnPower;
 }
         
-void Mecanum::setMaxSpeed(uint8_t maxSpeed){
+void Drivetrain::setMaxSpeed(uint8_t maxSpeed){
     this->maxSpeed = maxSpeed;
 }
 
-void Mecanum::updateMotor(int joyX, int joyX2, int joyY){
+
+Mecanum::Mecanum(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t kfr1, uint8_t kfr2, uint8_t kfl1, uint8_t kfl2, int deadzone)
+    : Drivetrain(kbr1, kbr2, kbl1, kbl2, kfr1, kfr2, kfl1, kfl2, deadzone){
+        
+}
+
+void Mecanum::updateMotor(int joyX, int joyX2, int joyY, int joyY2){
     
     // Great source for mecanum drive
     //https://gm0.org/en/latest/docs/software/tutorials/mecanum-drive.html
@@ -121,17 +140,3 @@ void Mecanum::updateMotor(int joyX, int joyX2, int joyY){
     setMotor(kunitfl,MCPWM_TIMER_0,(y_drive+x_drive+turn)*invertDir[3]); //frontleft
     
 }
-
-void Mecanum::invertMotor(int motor, bool inverted){
-    if (motor < 0 || motor >= 4){
-        Serial.println("Tried to invert motor greater than possible");
-        return;
-    }
-    
-    if (inverted){
-        invertDir[motor] = -1;
-        return;
-    } 
-    invertDir[motor] = 1;
-}
-

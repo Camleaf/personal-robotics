@@ -1,16 +1,18 @@
 #ifndef CAMLEAF_MAGNETOMETER 
 #define CAMLEAF_MAGNETOMETER
 
+#include "./drivetrain.h"
+
 using namespace std;
 
 
-class MagnetometerStore{
+class Magnetometer: public OrientationProvider{
     public:
-        MagnetometerStore();
+        Magnetometer();
         
-        void generate_tuned_values();
-        void fetch_data(uint32_t timestamp);
-        float get(); 
+        void generate_tuned_values() override;
+        void fetch_data(uint32_t timestamp) override;
+        float get() override; 
 
     private:
        
@@ -23,7 +25,7 @@ class MagnetometerStore{
         const float softY = 0;
 
 
-        const float yaw = 0;
+        float yaw = 0;
         uint32_t lastTime = 0;
 };
 

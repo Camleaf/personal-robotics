@@ -30,9 +30,9 @@
 
 
 
-Mecanum drivetrain(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2);
-OrientStore orientStore; // reserve the sda and scl pins. 21 SDA, 22 SCL
-
+Drivetrain* drivetrain = new Mecanum(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2);
+OrientationProvider* orientStore = new GyroMPU6050(); // reserve the sda and scl pins. 21 SDA, 22 SCL
+// Only making one of these so should be fine to use new
 
 
 ControllerPtr contr[BP32_MAX_CONTROLLERS];
@@ -66,10 +66,11 @@ void processControllers(){
         if (cptr->isConnected() && cptr->hasData()){
             if (cptr->isGamepad()){
                 
-                drivetrain.updateMotor(
+                drivetrain->updateMotor(
                     cptr->axisX(),
                     cptr->axisRX(),
-                    -cptr->axisY()
+                    -cptr->axisY(),
+                    cptr->axisRY()
                 ); 
             }
         }
@@ -89,18 +90,18 @@ void setup(){
         );
   
      
-    drivetrain.setMaxSpeed(maxSpeed);
-    drivetrain.setTurnPower(turnPower); 
+    drivetrain->setMaxSpeed(maxSpeed);
+    drivetrain->setTurnPower(turnPower); 
 
-    drivetrain.invertMotor(2,true);
-    drivetrain.invertMotor(1,true);
+    drivetrain->invertMotor(2,true);
+    drivetrain->invertMotor(1,true);
 
-    orientStore.create_threshold_values();
+    orientStore->generate_tuned_values();
 }
 
 
 void loop(){
-    orientStore.fetch_data(esp_timer_get_time());   
+    orientStore->fetch_data(esp_timer_get_time());   
     if (BP32.update()){
         processControllers();
     }

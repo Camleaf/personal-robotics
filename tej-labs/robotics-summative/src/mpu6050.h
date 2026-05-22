@@ -1,18 +1,19 @@
 #ifndef CAMLEAF_MPU6050
 #define CAMLEAF_MPU6050
+#include "drivetrain.h"
 #include <Adafruit_MPU6050.h>
 
 using namespace std;
 
 
-class OrientStore {
+class  GyroMPU6050: public OrientationProvider{
     public:
-        OrientStore();
-        void create_threshold_values();
+        GyroMPU6050();
+        void generate_tuned_values() override;
         
         
-        void fetch_data(uint32_t timestamp);
-        float get();
+        void fetch_data(uint32_t timestamp) override;
+        float get() override;
 
     private:
         Adafruit_MPU6050 mpu; 
