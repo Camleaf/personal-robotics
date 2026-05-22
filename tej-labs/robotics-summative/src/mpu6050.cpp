@@ -9,7 +9,7 @@ GyroMPU6050::GyroMPU6050(){
     if (!mpu.begin()) {
         Serial.println("Failed to find MPU6050 chip");
         // should get a neopixel for the final project to display odometry status but an LED works for now
-
+        return;
     }
     Serial.println("MPU6050 Found!");
     mpu.begin();

@@ -52,6 +52,7 @@ void onDisconnectedController(ControllerPtr cptr) {
     for (int i = 0; i < BP32_MAX_CONTROLLERS; i++){
         if (contr[i] == cptr) {
             contr[i] = nullptr;
+            drivetrain->updateMotor(0, 0, 0, 0);
             return;
         }
     }

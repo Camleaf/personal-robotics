@@ -3,7 +3,7 @@
 
 
 #include <Adafruit_MPU6050.h>
-
+#include <Adafruit_QMC5883P.h>
 
 class OrientationProvider {
     public:
@@ -25,7 +25,8 @@ class Magnetometer: public OrientationProvider{
         float getRadians() override;
 
     private:
-       
+        Adafruit_QMC5883P qmc;       
+
         // hard iron offsets
         const float hardX = 0;
         const float hardY = 0;
@@ -37,6 +38,8 @@ class Magnetometer: public OrientationProvider{
 
         float yaw = 0;
         uint32_t lastTime = 0;
+
+    
 };
 
 class  GyroMPU6050: public OrientationProvider{
