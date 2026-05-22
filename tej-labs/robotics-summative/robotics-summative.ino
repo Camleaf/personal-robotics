@@ -5,7 +5,6 @@
 
 #include "ArduinoController.h"
 #include "src/drivetrain.h"
-#include "src/mpu6050.h"
 #include <Bluepad32.h>
 #include <cstdlib>
 

@@ -1,10 +1,41 @@
-#ifndef CAMLEAF_MPU6050
-#define CAMLEAF_MPU6050
-#include "drivetrain.h"
+#ifndef CAMLEAF_ORIENTPROVIDER
+#define CAMLEAF_ORIENTPROVIDER
+
+
 #include <Adafruit_MPU6050.h>
 
-using namespace std;
 
+class OrientationProvider {
+    public:
+        virtual float get() = 0;
+        virtual void generate_tuned_values() = 0;
+        virtual void fetch_data(uint32_t timestamp) = 0; 
+};
+
+
+
+class Magnetometer: public OrientationProvider{
+    public:
+        Magnetometer();
+        
+        void generate_tuned_values() override;
+        void fetch_data(uint32_t timestamp) override;
+        float get() override; 
+
+    private:
+       
+        // hard iron offsets
+        const float hardX = 0;
+        const float hardY = 0;
+
+        // soft iron offset factors
+        const float softX = 0;
+        const float softY = 0;
+
+
+        float yaw = 0;
+        uint32_t lastTime = 0;
+};
 
 class  GyroMPU6050: public OrientationProvider{
     public:
@@ -35,6 +66,5 @@ class  GyroMPU6050: public OrientationProvider{
         float yaw = 0;
         uint32_t lastTime = 0; // microseconds
 };
-
 
 #endif

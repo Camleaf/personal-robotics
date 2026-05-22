@@ -4,6 +4,7 @@
 #include <array>
 #include <cstdint>
 #include <string>
+#include "./orientationprovider.h"
 
 #define DEBUG false 
 
@@ -37,20 +38,24 @@ class Drivetrain {
         array<int,4> invertDir = {1,1,1,1};
 };
 
-
+// robot centric mecanum
 class Mecanum: public Drivetrain {
     public:
         Mecanum(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t kfr1, uint8_t kfr2, uint8_t kfl1, uint8_t kfl2, int deadzone = 40);
         void updateMotor(int joyX1, int joyX2, int joyY, int joyY2) override; // Must be in range (-512,512)
 };
 
-
-class OrientationProvider {
+// field centric mecanum
+class FieldMecanum: public Drivetrain {
     public:
-        virtual float get() = 0;
-        virtual void generate_tuned_values() = 0;
-        virtual void fetch_data(uint32_t timestamp) = 0; 
+        FieldMecanum(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t kfr1, uint8_t kfr2, uint8_t kfl1, uint8_t kfl2, OrientationProvider* orientProvider, int deadzone = 40);
+        void updateMotor(int joyX1, int joyX2, int joyY, int joyY2) override; // Must be in range (-512,512)
+    private:
+       OrientationProvider* orientProvider;
+       array<array<float,4>,360> LUT;
 };
+
+
 
 
 #endif

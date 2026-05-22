@@ -1,6 +1,5 @@
 #include <Wire.h>
-#include <Adafruit_MPU6050.h>
-#include "./mpu6050.h"
+#include "./orientationprovider.h"
 
 
 GyroMPU6050::GyroMPU6050(){

@@ -2,6 +2,7 @@
 #include <cstdint>
 #include "./drivetrain.h"
 #include "driver/mcpwm.h"
+#include "orientationprovider.h"
 
 using namespace std;
 
@@ -112,6 +113,10 @@ void Drivetrain::setMaxSpeed(uint8_t maxSpeed){
 }
 
 
+/////////////////////////
+// Robot-Oriented Mecanum
+/////////////////////////
+
 Mecanum::Mecanum(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, uint8_t kfr1, uint8_t kfr2, uint8_t kfl1, uint8_t kfl2, int deadzone)
     : Drivetrain(kbr1, kbr2, kbl1, kbl2, kfr1, kfr2, kfl1, kfl2, deadzone){
         
@@ -140,3 +145,19 @@ void Mecanum::updateMotor(int joyX, int joyX2, int joyY, int joyY2){
     setMotor(kunitfl,MCPWM_TIMER_0,(y_drive+x_drive+turn)*invertDir[3]); //frontleft
     
 }
+
+/////////////////////////
+// Field-Oriented Mecanum
+/////////////////////////
+
+FieldMecanum::FieldMecanum(uint8_t kbr1, uint8_t kbr2, uint8_t kbl1, uint8_t kbl2, 
+        uint8_t kfr1, uint8_t kfr2, uint8_t kfl1, uint8_t kfl2, OrientationProvider* orientProvider, int deadzone)
+    : Drivetrain(kbr1, kbr2, kbl1, kbl2, kfr1, kfr2, kfl1, kfl2, deadzone){
+    this->orientProvider = orientProvider;
+}
+
+
+void FieldMecanum::updateMotor(int joyX, int joyX2, int joyY, int joyY2){
+    //to implement
+}
+
