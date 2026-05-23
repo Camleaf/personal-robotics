@@ -11,6 +11,7 @@ void Magnetometer::begin(){
     
     qmc.init();
     qmc.setMode(0x01,0x04,0x10,0xC0);
+
     qmc.setCalibrationOffsets(-577.00, 499.00, 2442.00);
     qmc.setCalibrationScales(2.06, 2.18, 0.49);
     x = 0;

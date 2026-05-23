@@ -3,16 +3,18 @@
 
 
 GyroMPU6050::GyroMPU6050(){
-    Wire.begin(21,22); // SDA and SCL
-    mpu = Adafruit_MPU6050();
+    yaw = 0;
+    lastTime = 0;
 
-    if (!mpu.begin()) {
+}
+
+void GyroMPU6050::begin(){
+
+    if (!mpu.begin(0x68,&Wire)) {
         Serial.println("Failed to find MPU6050 chip");
-        // should get a neopixel for the final project to display odometry status but an LED works for now
         return;
     }
     Serial.println("MPU6050 Found!");
-    mpu.begin();
     
     mpu.setAccelerometerRange(MPU6050_RANGE_4_G);
     mpu.setGyroRange(MPU6050_RANGE_500_DEG);
@@ -24,9 +26,6 @@ GyroMPU6050::GyroMPU6050(){
   
     Serial.print("gyro: ");
     Serial.println(mpu.getGyroRange());
-    yaw = 0;
-    lastTime = 0;
-
 }
 
 
@@ -42,8 +41,8 @@ double findMax(double num1, double num2){
 const int tuningCycles = 1000;
 void GyroMPU6050::generate_tuned_values(){
     /* Must be flat and still for accurate resting threshold data*/
-    float minRestingMagA, maxRestingMagA, thresholdA;
-    float minGZ, maxGZ, thresholdGZ;
+    float minRestingMagA, maxRestingMagA, thresholdA = 0;
+    float minGZ, maxGZ, thresholdGZ = 0;
 
     float avgMagA, avgGZ;
 
@@ -58,12 +57,12 @@ void GyroMPU6050::generate_tuned_values(){
         maxRestingMagA = findMax(maxRestingMagA,magA);
         minRestingMagA = findMin(minRestingMagA,magA);
 
-        maxGZ = findMax(maxGZ, g.acceleration.heading);
-        minGZ = findMin(minGZ, g.acceleration.heading);
+        maxGZ = findMax(maxGZ, g.gyro.z);
+        minGZ = findMin(minGZ, g.gyro.z);
         
 
         avgMagA += magA;
-        avgGZ += g.acceleration.heading;
+        avgGZ += g.gyro.z;
 
         delay(15);
     }
@@ -101,12 +100,16 @@ void GyroMPU6050::fetch_data(uint32_t timestamp){ // use esp timer to get this t
         return;
     }
     
-    uint32_t delta = (lastTime - timestamp) /1000000.0f;
+    if (timestamp - lastTime < 20000){
+        return;
+    }
+
+    float delta = (timestamp-lastTime) /1000000.0f;
     sensors_event_t a, g, temp;
     mpu.getEvent(&a, &g, &temp);
     
-    yaw += g.acceleration.heading * delta;
-    
+    yaw += (g.gyro.y-this->yawHardBias) * delta;
+    Serial.println(yaw); 
     lastTime = timestamp;
 }
 

@@ -42,7 +42,7 @@ class  GyroMPU6050: public OrientationProvider{
     public:
         GyroMPU6050();
         void generate_tuned_values() override;
-        
+        void begin() override;
         
         void fetch_data(uint32_t timestamp) override;
         float get() override;

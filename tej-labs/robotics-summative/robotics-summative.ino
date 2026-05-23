@@ -31,7 +31,7 @@
 
 
 
-OrientationProvider* orientStore = new Magnetometer(); // reserve the sda and scl pins. 21 SDA, 22 SCL
+OrientationProvider* orientStore = new GyroMPU6050(); // reserve the sda and scl pins. 21 SDA, 22 SCL
 // Only making one of these so should be fine to use new
 Drivetrain* drivetrain = new FieldMecanum(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2,orientStore);
 
@@ -89,9 +89,10 @@ void setup(){
     Serial.begin(115200);
       
     Wire.begin(21,22);
-    delay(100);
+    delay(500);
     orientStore->begin();
-
+    delay(100);
+    orientStore->generate_tuned_values();
 
     BP32.setup(
             onConnectedController,
