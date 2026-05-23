@@ -3,10 +3,11 @@
 
 
 #include <Adafruit_MPU6050.h>
-#include <Adafruit_QMC5883P.h>
+#include <QMC5883LCompass.h>
 
 class OrientationProvider {
     public:
+        virtual void begin() = 0;
         virtual float get() = 0;
         virtual float getRadians() = 0;
         virtual void generate_tuned_values() = 0;
@@ -18,25 +19,20 @@ class OrientationProvider {
 class Magnetometer: public OrientationProvider{
     public:
         Magnetometer();
-        
+        void begin() override;
         void generate_tuned_values() override;
         void fetch_data(uint32_t timestamp) override;
         float get() override; 
         float getRadians() override;
 
     private:
-        Adafruit_QMC5883P qmc;       
+        QMC5883LCompass qmc;       
+        
+        const float alpha_low_pass = 0.15f;
+        volatile float x;
+        volatile float y;
 
-        // hard iron offsets
-        const float hardX = 0;
-        const float hardY = 0;
-
-        // soft iron offset factors
-        const float softX = 0;
-        const float softY = 0;
-
-
-        float yaw = 0;
+        volatile float yaw = 0;
         uint32_t lastTime = 0;
 
     
@@ -69,7 +65,7 @@ class  GyroMPU6050: public OrientationProvider{
         
 
         // main collected value
-        float yaw = 0;
+        volatile float yaw = 0;
         uint32_t lastTime = 0; // microseconds
 };
 

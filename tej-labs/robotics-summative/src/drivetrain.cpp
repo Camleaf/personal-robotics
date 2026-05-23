@@ -170,19 +170,23 @@ void FieldMecanum::updateMotor(int joyX, int joyX2, int joyY, int joyY2){
     joyX2 = map(joyX2,-512,512,-turnPower,turnPower);
     joyY = map(joyY,-512,512,-maxSpeed,maxSpeed);
 
-    float botHeading = orientProvider->getRadians();
+    volatile float botHeading = orientProvider->getRadians();
 
     int x_drive = constrain(joyX,-maxSpeed,maxSpeed); // horizontal drive
     int y_drive = constrain(joyY,-maxSpeed,maxSpeed); // standard drive
     int turn = constrain(joyX2,-turnPower,turnPower); 
-    x_drive *= 1.4f;
 
     float rot_x_drive = x_drive * cosf(-botHeading) - y_drive * sinf(-botHeading);
     float rot_y_drive = x_drive * sinf(-botHeading) + y_drive * cosf(-botHeading);
+              
+    float br = constrain(rot_y_drive + rot_x_drive - turn, -255.0f, 255.0f);
+    float fr = constrain(rot_y_drive - rot_x_drive - turn, -255.0f, 255.0f);
+    float bl = constrain(rot_y_drive - rot_x_drive + turn, -255.0f, 255.0f);
+    float fl = constrain(rot_y_drive + rot_x_drive + turn, -255.0f, 255.0f);
     
-    setMotor(kunitbr,MCPWM_TIMER_1,(rot_y_drive+rot_x_drive-turn)*invertDir[0]); //backright
-    setMotor(kunitfr,MCPWM_TIMER_1,(rot_y_drive-rot_x_drive-turn)*invertDir[1]); //frontright
-    setMotor(kunitbl,MCPWM_TIMER_0,(rot_y_drive-rot_x_drive+turn)*invertDir[2]); //backleft
-    setMotor(kunitfl,MCPWM_TIMER_0,(rot_y_drive+rot_x_drive+turn)*invertDir[3]); //frontleft
+    setMotor(kunitbr, MCPWM_TIMER_1, br * invertDir[0]); 
+    setMotor(kunitfr, MCPWM_TIMER_1, fr * invertDir[1]); 
+    setMotor(kunitbl, MCPWM_TIMER_0, bl * invertDir[2]); 
+    setMotor(kunitfl, MCPWM_TIMER_0, fl * invertDir[3]);
 }
 
