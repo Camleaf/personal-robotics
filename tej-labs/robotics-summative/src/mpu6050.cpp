@@ -1,9 +1,11 @@
 #include <Wire.h>
 #include "./orientationprovider.h"
 
+void OrientationProvider::setYaw(float yaw){
+    this->yaw = yaw;
+}
 
 GyroMPU6050::GyroMPU6050(){
-    yaw = 0;
     lastTime = 0;
 
 }

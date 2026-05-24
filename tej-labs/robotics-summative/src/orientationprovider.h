@@ -12,6 +12,10 @@ class OrientationProvider {
         virtual float getRadians() = 0;
         virtual void generate_tuned_values() = 0;
         virtual void fetch_data(uint32_t timestamp) = 0; 
+        void setYaw(float yaw);
+
+    protected:
+        volatile float yaw = 0;
 };
 
 
@@ -32,7 +36,6 @@ class Magnetometer: public OrientationProvider{
         volatile float x;
         volatile float y;
 
-        volatile float yaw = 0;
         uint32_t lastTime = 0;
 
     

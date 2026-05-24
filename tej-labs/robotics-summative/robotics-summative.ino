@@ -59,7 +59,7 @@ void onDisconnectedController(ControllerPtr cptr) {
     }
 }
 
-
+uint32_t optionsTimeout;
 void processControllers(){
     for (auto cptr: contr) {
         if (!cptr) continue;
@@ -75,6 +75,12 @@ void processControllers(){
                 ); 
             }
         }
+
+        if (millis() - optionsTimeout > 1000){
+          orientStore->setYaw(0);
+        }
+
+        
 
     }
 }
@@ -103,7 +109,7 @@ void setup(){
     drivetrain->invertMotor(0,true);
     drivetrain->invertMotor(3,true);
  
-
+    optionsTimeout = millis();
     delay(500);
 }
 
