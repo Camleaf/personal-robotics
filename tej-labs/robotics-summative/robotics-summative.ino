@@ -73,12 +73,14 @@ void processControllers(){
                     -cptr->axisY(),
                     cptr->axisRY()
                 ); 
+
+                if (millis() - optionsTimeout > 1000 && cptr->miscSelect()){
+                  orientStore->setYaw(0);
+                  optionsTimeout = millis();
+                }
             }
         }
 
-        if (millis() - optionsTimeout > 1000){
-          orientStore->setYaw(0);
-        }
 
         
 

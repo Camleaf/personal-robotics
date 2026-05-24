@@ -59,7 +59,6 @@ class  GyroMPU6050: public OrientationProvider{
          
 
         // main collected value
-        volatile float yaw = 0;
         uint32_t lastTime = 0; // microseconds
 };
 
