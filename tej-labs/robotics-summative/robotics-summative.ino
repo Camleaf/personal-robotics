@@ -8,7 +8,6 @@
 #include "src/orientationprovider.h"
 #include <Bluepad32.h>
 #include <cstdlib>
-#include <freertos/task.h>
 
 //// drivetrain
 // Back right
@@ -88,8 +87,6 @@ void setup(){
     }
     Serial.begin(115200);
       
-    Wire.begin(21,22);
-    delay(500);
     orientStore->begin();
     delay(100);
     orientStore->generate_tuned_values();

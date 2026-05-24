@@ -2,7 +2,7 @@
 #define CAMLEAF_ORIENTPROVIDER
 
 
-#include <Adafruit_MPU6050.h>
+
 #include <QMC5883LCompass.h>
 
 class OrientationProvider {
@@ -49,20 +49,11 @@ class  GyroMPU6050: public OrientationProvider{
         float getRadians() override;
 
     private:
-        Adafruit_MPU6050 mpu; 
         static constexpr float bias_filter_pass = 0.5f;
-        
-        // add hardcoded values for threshold stuff just as default In case I don't feel like recalibrating each boot
-        float yawVariance = 0.f;
-        float accelMagVariance = 0.f;
-        
-        float minAccelResting = 0.f;
-        float maxAccelResting = 0.f;
-        
-        // Could dynamically update these
-        float accelHardBias = 0.f;
+        static constexpr int MPUaddr = 0x68; 
+
         float yawHardBias = 0.f;
-        
+         
 
         // main collected value
         volatile float yaw = 0;
