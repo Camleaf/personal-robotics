@@ -175,6 +175,8 @@ void FieldMecanum::updateMotor(int joyX, int joyX2, int joyY, int joyY2){
     int x_drive = constrain(joyX,-maxSpeed,maxSpeed); // horizontal drive
     int y_drive = constrain(joyY,-maxSpeed,maxSpeed); // standard drive
     int turn = constrain(joyX2,-turnPower,turnPower); 
+    
+    x_drive *= 1.4;
 
     float rot_x_drive = x_drive * cosf(-botHeading) - y_drive * sinf(-botHeading);
     float rot_y_drive = x_drive * sinf(-botHeading) + y_drive * cosf(-botHeading);
