@@ -17,7 +17,7 @@
 #define kbl1 26
 #define kbl2 27
 // Front right
-#define kfr1 18 // switch this because it intersects with sda
+#define kfr1 18
 #define kfr2 19
 // Front left
 #define kfl1 15
