@@ -3,6 +3,7 @@
 #include "src/shooter.h"
 #include "src/intake.h"
 #include "src/state.h"
+#include <Bluepad32.h>
 
 #define rx 16
 #define tx 17
@@ -10,7 +11,7 @@
 
 HardwareSerial uartConnection(2);
 StateAssign rStateAssign;
-RobotState* rstate = &rStateAssign.state;
+RobotState* rState = &rStateAssign.state;
 
 void setup() {
   Serial.begin(9600);
@@ -23,7 +24,6 @@ void setup() {
 void loop() {
   if (uartConnection.available()) {
     rStateAssign.raw = uartConnection.read();
+    rState->buttons;
   }
-
-  
 }

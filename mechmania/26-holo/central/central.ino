@@ -5,8 +5,10 @@
 
 #include "ArduinoController.h"
 #include "src/drivetrain.h"
+#include "src/state.h"
 #include "src/orientationprovider.h"
 #include <Bluepad32.h>
+#include <HardwareSerial.h>
 #include <cstdlib>
 
 //// drivetrain
@@ -28,8 +30,13 @@
 #define turnPower 140
 
 
+#define rx 16
+#define tx 17
+#define baud 115200
 
-
+HardwareSerial uartConnection(2);
+StateAssign rStateAssign;
+RobotState* rState = &rStateAssign.state;
 OrientationProvider* orientStore = new GyroMPU6050(); // reserve the sda and scl pins. 21 SDA, 22 SCL
 // Only making one of these so should be fine to use new
 Drivetrain* drivetrain = new FieldMecanum(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2,orientStore);
@@ -74,6 +81,8 @@ void processControllers(){
                     -cptr->axisY(),
                     cptr->axisRY()
                 ); 
+                  
+                rState->buttons = cptr->buttons();
 
                 if (millis() - optionsTimeout > 1000 && cptr->miscSelect()){
                   orientStore->setYaw(0);
@@ -88,14 +97,21 @@ void processControllers(){
     }
 }
 
-
+uint32_t msgInterval = 0;
+void msgCoproc(){
+    if (millis()-msgInterval > 250) {
+        uartConnection.write(rStateAssign.raw);
+        msgInterval = millis();
+    }
+}
 
 void setup(){
     for (int i = 0; i < BP32_MAX_CONTROLLERS; i++) {
       contr[i] = nullptr;
     }
     Serial.begin(115200);
-      
+    uartConnection.begin(baud,SERIAL_8N1,rx,tx);
+    
     orientStore->begin();
     delay(100);
     orientStore->generate_tuned_values();
@@ -118,6 +134,7 @@ void setup(){
 
 
 void loop(){
+    msgCoproc();
     orientStore->fetch_data(esp_timer_get_time());
     if (BP32.update()){
         processControllers();

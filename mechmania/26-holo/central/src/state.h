@@ -7,7 +7,7 @@ struct  [[gnu::packed]] RobotState{
 };
 
 union StateAssign{
-    uint16_t raw = 0; // make size match robotState
+    uint16_t raw = 0; // make match robotState
     RobotState state;
 };
 

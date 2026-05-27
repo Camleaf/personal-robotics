@@ -7,7 +7,7 @@ class Shooter{
         //flywheel motor out  //servo base  // servo upper // beam break in
         Shooter(uint8_t kfly, uint8_t ksvb, uint8_t ksvu, uint8_t kbm);
         
-        void setAngle();
+        void setAngle(int angle);
         void enabled(bool en);
         void lockInterrupt(); // auto lock on beam triggering
         void shoot();
