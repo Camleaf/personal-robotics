@@ -57,6 +57,7 @@ void onDisconnectedController(ControllerPtr cptr) {
             return;
         }
     }
+    
 }
 
 uint32_t optionsTimeout;
