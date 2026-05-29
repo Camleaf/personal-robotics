@@ -4,10 +4,12 @@
 #include <cstdint>
 struct  [[gnu::packed]] RobotState{
     uint16_t buttons = 0;
+    uint8_t dpad = 0;
+    uint8_t empty = 0;
 };
 
 union StateAssign{
-    uint16_t raw = 0; // make size match robotState
+    uint32_t raw = 0; // make size match robotState
     RobotState state;
 };
 

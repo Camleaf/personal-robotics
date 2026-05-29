@@ -83,6 +83,7 @@ void processControllers(){
                 ); 
                   
                 rState->buttons = cptr->buttons();
+                rState->dpad = cptr->dpad();
 
                 if (millis() - optionsTimeout > 1000 && cptr->miscSelect()){
                   orientStore->setYaw(0);
