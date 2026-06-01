@@ -1,12 +1,18 @@
-#ifndef CAMLEAF_SHOOTER
-#define CAMLEAF_SHOOTER
+#ifndef CAMLEAF_MECANISMS
+#define CAMLEAF_MECANISMS
 
 #include <cstdint>
+#include <ESP32Servo.h>
+#include <driver/mcpwm.h>
+
+void setMotor(mcpwm_unit_t unit, mcpwm_timer_t timer, float val);
+
 class Shooter{
     public:         
-        //flywheel motor out  //servo base  // motor upper // beam break in
+        //flywheel motor out  //servo base  // motor feed // beam break in
         Shooter(uint8_t kfly, uint8_t ksvb, uint8_t ku, uint8_t kbm);
         
+        void begin();
         void setAngle(int angle);
         void enabled(bool en); // flywheels on/off
         
@@ -20,6 +26,23 @@ class Shooter{
         uint8_t ku = 0;
         uint8_t kbm = 0;
         volatile bool locked = false;
+        volatile bool shooter_running = false;
+        Servo srv;
 };
+
+
+class Intake{
+    public:
+        //  upper roller motor outs    // beam break
+        Intake(uint8_t ku1, uint8_t ku2);
+
+        void setSpeed(uint8_t speed, bool reversed=false);
+        void off();
+
+    private:
+        uint8_t ku1 = 0;
+        uint8_t ku2 = 0;
+};
+
 
 #endif

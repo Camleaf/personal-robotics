@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
-#include "src/shooter.h"
-#include "src/intake.h"
+#include "src/mechanisms.h"
 #include "src/state.h"
 #include <Bluepad32.h>
+#include <ESP32Servo.h>
 
 #define rx 16
 #define tx 17
@@ -16,14 +16,9 @@ RobotState* rState = &rStateAssign.state;
 
 //// INTAKE
 //
-// Bottom roller motor
-#define kb1_in 0
-#define kb2_in 0
 // Top roller motor
 #define ku1_in 0
 #define ku2_in 0
-// beam break signal
-#define kbm_in 0
 
 //// SHOOTER
 // flywheel motors
@@ -35,13 +30,15 @@ RobotState* rState = &rStateAssign.state;
 // beam break signal
 #define kbm_sh 0
 
-Intake* intake = new Intake(kb1_in,kb2_in,ku1_in,ku2_in,kbm_in);
+Intake* intake = new Intake(ku1_in,ku2_in);
 Shooter* shooter = new Shooter(kfly_sh,ksvb_sh,ku_sh,kbm_sh);
 
 
 void setup() {
   Serial.begin(9600);
-  
+  ESP32PWM::allocateTimer(0);
+  shooter->begin();
+
   uartConnection.begin(baud, SERIAL_8N1, rx, tx);
   Serial.println("uart init");
 }

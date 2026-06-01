@@ -1,17 +1,31 @@
-#include "./intake.h"
+#include "./mechanisms.h"
 #include "driver/mcpwm.h"
 #include <cstdint>
 
+void setMotor(mcpwm_unit_t unit, mcpwm_timer_t timer, float val){
+    float duty = abs(val) * 100.0f / 255.0f; //MCPWM needs 0 - 100 float
+    duty = constrain(duty,0.0f,100.0f);
 
-void setupMCPWM(uint8_t kb1,uint8_t kb2, uint8_t ku1, uint8_t ku2){
+    if (val > 0) {
+        mcpwm_set_duty(unit, timer, MCPWM_GEN_A, duty);
+        mcpwm_set_duty_type(unit, timer, MCPWM_GEN_A, MCPWM_DUTY_MODE_0);
+        mcpwm_set_signal_low(unit, timer, MCPWM_GEN_B); // Ensure other pin is OFF
+    } else if (val < 0) {
+        mcpwm_set_signal_low(unit, timer, MCPWM_GEN_A);
+        mcpwm_set_duty(unit, timer, MCPWM_GEN_B, duty);
+        mcpwm_set_duty_type(unit, timer, MCPWM_GEN_B, MCPWM_DUTY_MODE_0);
+    } else {
+        mcpwm_set_signal_low(unit, timer, MCPWM_GEN_A);
+        mcpwm_set_signal_low(unit, timer, MCPWM_GEN_B);
+    }
+}
+
+void setupMCPWM_in(uint8_t ku1, uint8_t ku2){
     // reserved setup for Intake
 
-    // front left
-    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, kb1);
-    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, kb2);
-    // front right
-    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1A, ku1);
-    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1B, ku2);
+
+    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, ku1);
+    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, ku2);
 
     // Reserve mcpwm unit 0 for intake
 
@@ -24,28 +38,21 @@ void setupMCPWM(uint8_t kb1,uint8_t kb2, uint8_t ku1, uint8_t ku2){
     
     // Init mcpwm 
     mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_conf);
-    mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_1, &pwm_conf);
 }
 
 
 
-Intake::Intake(uint8_t kb1, uint8_t kb2, uint8_t ku1, uint8_t ku2, uint8_t kbm){
-    this->kb1 = kb1;
-    this->kb2 = kb2;
+Intake::Intake(uint8_t ku1, uint8_t ku2){
     this->ku1 = ku1;
     this->ku2 = ku2;
-    this->kbm = kbm;
     
-    setupMCPWM(kb1,kb2,ku1,ku2);
+    setupMCPWM_in(ku1,ku2);
 }
 
-void Intake::enabled(bool en){
-    
+void Intake::setSpeed(uint8_t speed, bool reversed){
+     setMotor(MCPWM_UNIT_0,MCPWM_TIMER_0,speed * (reversed?-1:1));     
 }
 
-void Intake::reversed(bool en){
-    
-} 
-void Intake::stageInterrupt(){
-    
+void Intake::off(){
+    setSpeed(0,false);
 }
