@@ -16,9 +16,9 @@ class Shooter{
         void setAngle(int angle);
         void enabled(bool en); // flywheels on/off
         
-        void feedInterrupt(); // auto lock feed roller on beam triggering
+        static void feedInterrupt(void* arg); // auto lock feed roller on beam triggering
         void shoot(); // run feed roller to push into flywheel.
-        void startFeed(); // start the feed roller. Will get auto stopped by lockInterrupt.
+        void setFeed(uint8_t speed=50); // start the feed roller. Will get auto stopped by lockInterrupt.
     
     private:
         uint8_t kfly = 0;

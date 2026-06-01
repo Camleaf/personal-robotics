@@ -1,6 +1,6 @@
 #include "./mechanisms.h"
 #include "driver/mcpwm.h"
-
+#include "esp_attr.h"
 
 
 void setupMCPWM_sh(uint8_t kfly,uint8_t ku){
@@ -30,6 +30,7 @@ Shooter::Shooter(uint8_t kfly, uint8_t ksvb, uint8_t ku, uint8_t kbm){
     this->kbm = kbm;
         
     setupMCPWM_sh(kfly, ku);
+    attachInterruptArg(digitalPinToInterrupt(kbm), feedInterrupt, this, CHANGE);
 }
 
 void Shooter::begin(){
@@ -57,21 +58,27 @@ void Shooter::shoot(){
         enabled(true); 
         delay(200);
     }
-
-    setMotor(MCPWM_UNIT_1,MCPWM_TIMER_1,150);
+    
+    setFeed(150);
 
     locked = false;
 
     delay(400);
-    setMotor(MCPWM_UNIT_1,MCPWM_TIMER_1,0);
-
+    setFeed(0);
 }
 
 
-void Shooter::startFeed(){
-    
+void Shooter::setFeed(uint8_t speed){
+    setMotor(MCPWM_UNIT_1,MCPWM_TIMER_1,speed);
 }
 
-void Shooter::feedInterrupt(){
+void IRAM_ATTR Shooter::feedInterrupt(void* arg){
+    Shooter* self = static_cast<Shooter*>(arg);
+    if (digitalRead(self->kbm) == HIGH){ // If not broken
+        self->locked = false;
+        return;
+    }
 
+    self->locked = true;
+    self->setFeed(0); 
 }
