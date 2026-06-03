@@ -110,7 +110,6 @@ int lastTime = 0;
 void loop() {
   if (uartConnection.available()) {
     rStateAssign.raw = uartConnection.read();
-    rState->buttons;
     if (millis()-lastTime>250){
       handleButtons();
       lastTime = millis();
