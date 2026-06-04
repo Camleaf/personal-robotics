@@ -29,14 +29,13 @@
 #define maxSpeed 140
 #define turnPower 140
 
-
-#define rx 16
-#define tx 17
-#define baud 115200
+#define rx 32
+#define tx 33
+#define baud 9600 
 
 HardwareSerial uartConnection(2);
-StateAssign rStateAssign;
-RobotState* rState = &rStateAssign.state;
+RobotState* rState = new RobotState();
+
 OrientationProvider* orientStore = new GyroMPU6050(); // reserve the sda and scl pins. 21 SDA, 22 SCL
 // Only making one of these so should be fine to use new
 Drivetrain* drivetrain = new FieldMecanum(kbr1,kbr2,kbl1,kbl2,kfr1,kfr2,kfl1,kfl2,orientStore);
@@ -101,7 +100,8 @@ void processControllers(){
 uint32_t msgInterval = 0;
 void msgCoproc(){
     if (millis()-msgInterval > 250) {
-        uartConnection.write(rStateAssign.raw);
+        int data = rState->getInt();
+        uartConnection.write((uint8_t*)&data, sizeof(data));
         msgInterval = millis();
     }
 }

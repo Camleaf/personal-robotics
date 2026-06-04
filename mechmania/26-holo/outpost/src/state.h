@@ -5,17 +5,17 @@
 struct  [[gnu::packed]] RobotState{
     uint16_t buttons = 0;
     uint8_t dpad = 0;
-    uint8_t empty = 0;
-    RobotState() {}
-};
+    int getInt(){
+      return buttons << 16 | dpad;
+    }
 
-union StateAssign{
-    uint32_t raw = 0; // make size match robotState
-    RobotState state;
-    StateAssign() {}
+    void unload(int raw){
+      dpad = raw | ((1UL<<8) - 1);
+      raw >>= 8;
+      buttons = raw | ((1UL<<16)-1);
+    }
 };
 
 extern RobotState* rState;
-extern StateAssign rStateAssign;
 
 #endif

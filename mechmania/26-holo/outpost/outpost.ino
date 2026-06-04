@@ -4,13 +4,12 @@
 #include "src/state.h"
 #include <ESP32Servo.h>
 
-#define rx 16
-#define tx 17
-#define baud 115200
+#define rx 25 
+#define tx 26
+#define baud 9600 
 
 HardwareSerial uartConnection(2);
-StateAssign rStateAssign;
-RobotState* rState = &rStateAssign.state;
+RobotState* rState = new RobotState;
 
 
 //// INTAKE
@@ -109,7 +108,7 @@ int lastTime = 0;
 
 void loop() {
   if (uartConnection.available()) {
-    rStateAssign.raw = uartConnection.read();
+    rState->unload(uartConnection.read());
     if (millis()-lastTime>250){
       handleButtons();
       lastTime = millis();
