@@ -1,7 +1,9 @@
 #ifndef CAMLEAF_COPROC
 #define CAMLEAF_COPROC
 
+#include <array>
 #include <cstdint>
+
 struct  [[gnu::packed]] RobotState{
     uint16_t buttons = 0;
     uint8_t dpad = 0;

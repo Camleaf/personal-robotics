@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include "src/mechanisms.h"
-#include "src/state.h"
+#include "src/state.hpp"
 #include <ESP32Servo.h>
 
 #define rx 25 

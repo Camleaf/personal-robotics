@@ -5,7 +5,7 @@
 
 #include "ArduinoController.h"
 #include "src/drivetrain.h"
-#include "src/state.h"
+#include "src/state.hpp"
 #include "src/orientationprovider.h"
 #include <Bluepad32.h>
 #include <HardwareSerial.h>
