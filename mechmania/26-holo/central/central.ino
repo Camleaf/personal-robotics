@@ -110,7 +110,7 @@ void setup(){
     for (int i = 0; i < BP32_MAX_CONTROLLERS; i++) {
       contr[i] = nullptr;
     }
-    Serial.begin(115200);
+    Serial.begin(9600);
     uartConnection.begin(baud,SERIAL_8N1,rx,tx);
     
     orientStore->begin();
