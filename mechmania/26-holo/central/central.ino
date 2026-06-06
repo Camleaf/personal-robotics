@@ -29,8 +29,8 @@
 #define maxSpeed 140
 #define turnPower 140
 
-#define rx 32
-#define tx 33
+#define rx 16 
+#define tx 17
 #define baud 9600 
 
 HardwareSerial uartConnection(2);
@@ -102,6 +102,7 @@ void msgCoproc(){
     if (millis()-msgInterval > 250) {
         int data = rState->getInt();
         uartConnection.write((uint8_t*)&data, sizeof(data));
+        Serial.println(data);
         msgInterval = millis();
     }
 }

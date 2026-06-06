@@ -6,13 +6,14 @@ struct  [[gnu::packed]] RobotState{
     uint16_t buttons = 0;
     uint8_t dpad = 0;
     int getInt(){
-      return buttons << 16 | dpad;
+        return buttons << 8 | dpad;
     }
 
-    void unload(int raw){
-      dpad = raw | ((1UL<<8) - 1);
-      raw >>= 8;
-      buttons = raw | ((1UL<<16)-1);
+    void unload(uint32_t raw){
+        Serial.println(raw);
+        dpad = raw & ((1UL<<8) - 1);
+        raw >>= 8;
+        buttons = raw & ((1UL<<16)-1);
     }
 };
 

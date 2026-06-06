@@ -36,7 +36,7 @@ Shooter::Shooter(uint8_t kfly, uint8_t ksvb, uint8_t ku, uint8_t kbm){
 void Shooter::begin(){
     srv.setPeriodHertz(50);    // standard 50 hz servo
 	srv.attach(ksvb); 
-    srv.write(30);
+    srv.write(180);
 }
 
 void Shooter::enabled(bool en){
@@ -46,7 +46,7 @@ void Shooter::enabled(bool en){
 
 
 void Shooter::setAngle(int angle){
-    if (angle < 30 || angle > 80) return; // hardware protection
+    if (angle < 120 || angle > 180) return; // hardware protectio
     srv.write(angle);
 }
 

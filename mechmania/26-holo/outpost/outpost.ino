@@ -4,8 +4,8 @@
 #include "src/state.hpp"
 #include <ESP32Servo.h>
 
-#define rx 25 
-#define tx 26
+#define rx 18 
+#define tx 23
 #define baud 9600 
 
 HardwareSerial uartConnection(2);
@@ -15,20 +15,19 @@ RobotState* rState = new RobotState;
 //// INTAKE
 //
 // Top roller motor
-#define ku1_in 0
-#define ku2_in 0
+#define ku_in 5
 
 //// SHOOTER
 // flywheel motors
 #define kfly_sh 0
 // servo signal
-#define ksvb_sh 0
+#define ksvb_sh 32
 // feed motor
 #define ku_sh 0
 // beam break signal
 #define kbm_sh 0
 
-Intake* intake = new Intake(ku1_in,ku2_in);
+Intake* intake = new Intake(ku_in);
 Shooter* shooter = new Shooter(kfly_sh,ksvb_sh,ku_sh,kbm_sh);
 
 
@@ -52,13 +51,13 @@ void handleButtons(){
   /////////
 
   if (dpad & 1UL){ // DPAD up
-      shooter->setAngle(80); 
+      shooter->setAngle(120); 
   } else if (dpad & (1UL << 1)){ // DPAD down
-      shooter->setAngle(30); 
+      shooter->setAngle(180); 
   } else if (dpad & (1UL << 2)){ // DPAD right
-      shooter->setAngle(45); 
+      shooter->setAngle(160); 
   } else if (dpad & (1UL << 3)){ // DPAD left
-      shooter->setAngle(60); 
+      shooter->setAngle(140); 
   }
 
   ///////
@@ -68,12 +67,12 @@ void handleButtons(){
   if (buttons & 1UL){ // X 
     //Enable shooting
     shooter->enabled(true);
-  } else if (buttons & (1UL << 2)){ // Circle
+  } else if (buttons & (1UL << 1)){ // Circle
     // Stuff off
     shooter->enabled(false);
     shooter->setFeed(0);
     intake->setSpeed(0);
-  } else if (buttons & (1UL << 3)){ // Square
+  } else if (buttons & (1UL << 2)){ // Square
     // Shoot
     shooter->shoot();
   } 
@@ -81,23 +80,20 @@ void handleButtons(){
   ////////
   // Intake settings
   ////////
-  if (buttons & (1UL << 4)){ // Triangle     
-    //Intake reversed
-    intake->setSpeed(255,true);
-    shooter->setFeed(0);
-  } else if (buttons & (1UL << 5)){ // L1
+  if (buttons & (1UL << 3)){ // Triangle     
+  } else if (buttons & (1UL << 4)){ // L1
     //Intake on
     intake->setSpeed(255);
     shooter->setFeed(50);
-  } else if (buttons & (1UL << 6)){ // R1
+  } else if (buttons & (1UL << 5)){ // R1
     // Intake off
     intake->setSpeed(0);
     shooter->setFeed(0);
   }
 
-  if (buttons & (1UL << 7)){ // L2
+  if (buttons & (1UL << 6)){ // L2
 
-  } else if (buttons & (1UL << 8)){ // R2
+  } else if (buttons & (1UL << 7)){ // R2
   
   }
 
@@ -105,12 +101,15 @@ void handleButtons(){
 }
 
 int lastTime = 0;
+uint32_t buf;
 
 void loop() {
-  if (uartConnection.available()) {
-    rState->unload(uartConnection.read());
+  if (uartConnection.available() >= sizeof(buf)){ // 4 Bytes, or size of sent message 
+    uartConnection.read((uint8_t*)&buf, sizeof(buf));
+    rState->unload(buf);
     if (millis()-lastTime>250){
       handleButtons();
+      Serial.println(rState->dpad);
       lastTime = millis();
     }
   }

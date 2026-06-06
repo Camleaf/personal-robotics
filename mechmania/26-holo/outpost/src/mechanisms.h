@@ -34,14 +34,13 @@ class Shooter{
 class Intake{
     public:
         //  upper roller motor outs    // beam break
-        Intake(uint8_t ku1, uint8_t ku2);
+        Intake(uint8_t ku);
 
-        void setSpeed(uint8_t speed, bool reversed=false);
+        void setSpeed(uint8_t speed);
         void off();
 
     private:
-        uint8_t ku1 = 0;
-        uint8_t ku2 = 0;
+        uint8_t ku = 0;
 };
 
 

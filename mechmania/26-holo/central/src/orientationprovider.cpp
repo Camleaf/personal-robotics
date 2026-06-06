@@ -119,7 +119,6 @@ void GyroMPU6050::fetch_data(uint32_t timestamp){ // use esp timer to get this t
     
     yaw += (gyroZ - yawHardBias) * delta;
     
-    Serial.println(yaw);
     lastTime = timestamp;
 }
 
