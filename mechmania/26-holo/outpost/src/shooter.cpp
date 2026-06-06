@@ -46,7 +46,8 @@ void Shooter::enabled(bool en){
 
 
 void Shooter::setAngle(int angle){
-    if (angle < 120 || angle > 180) return; // hardware protectio
+    if (angle < 140 || angle > 180) return; // hardware protectio
+                
     srv.write(angle);
 }
 

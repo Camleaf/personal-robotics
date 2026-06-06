@@ -51,13 +51,13 @@ void handleButtons(){
   /////////
 
   if (dpad & 1UL){ // DPAD up
-      shooter->setAngle(120); 
+      shooter->setAngle(140); 
   } else if (dpad & (1UL << 1)){ // DPAD down
       shooter->setAngle(180); 
   } else if (dpad & (1UL << 2)){ // DPAD right
-      shooter->setAngle(160); 
+      shooter->setAngle(165); 
   } else if (dpad & (1UL << 3)){ // DPAD left
-      shooter->setAngle(140); 
+      shooter->setAngle(155); 
   }
 
   ///////
