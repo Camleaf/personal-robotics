@@ -16,18 +16,18 @@ RobotState* rState = new RobotState;
 //
 // Top roller motor
 #define ku_in 5
-#define ku_in2 0
+#define ku_in2 9
 
 //// SHOOTER
 // flywheel motors
-#define kfly_sh 0
-#define kfly2_sh 0
+#define kfly_sh 10
+#define kfly2_sh 26
 // servo signal
 #define ksvb_sh 32
 // feed motor
-#define ku_sh 0
+#define ku_sh 25
 // beam break signal
-#define kbm_sh 0
+#define kbm_sh 34
 
 Intake* intake = new Intake(ku_in,ku_in2);
 Shooter* shooter = new Shooter(kfly_sh,kfly2_sh,ksvb_sh,ku_sh,kbm_sh);
@@ -83,7 +83,7 @@ void handleButtons(){
   // Intake settings
   ////////
   if (buttons & (1UL << 3)){ // Triangle     
-    intake->setSpeed(150,true);
+    intake->setSpeed(150,true); // reversed
     shooter->setFeed(0);
   } else if (buttons & (1UL << 4)){ // L1
     //Intake on
@@ -105,6 +105,7 @@ void handleButtons(){
 }
 
 int lastTime = 0;
+int feedUpdateTimeout = 0;
 uint32_t buf;
 
 void loop() {
@@ -117,4 +118,9 @@ void loop() {
       lastTime = millis();
     }
   }
+  if (digitalRead(shooter->kbm) != HIGH && millis()-feedUpdateTimeout >  100){ // If not broken
+        shooter->setFeed(0); 
+        feedUpdateTimeout = millis();
+  }
+
 }

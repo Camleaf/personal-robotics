@@ -1,1 +1,1 @@
-arduino-cli monitor -p /dev/ttyUSB1 --config baudrate=9600
+arduino-cli monitor -p /dev/ttyUSB0 --config baudrate=9600

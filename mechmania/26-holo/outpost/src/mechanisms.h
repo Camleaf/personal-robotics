@@ -17,17 +17,16 @@ class Shooter{
         void setAngle(int angle);
         void enabled(bool en); // flywheels on/off
         
-        static void feedInterrupt(void* arg); // auto lock feed roller on beam triggering
         void shoot(); // run feed roller to push into flywheel.
         void setFeed(uint8_t speed=50); // start the feed roller. Will get auto stopped by lockInterrupt.
     
+        volatile bool locked = false;
+        uint8_t kbm = 0;
     private:
         uint8_t kfly = 0;
         uint8_t ksvb = 0;
         uint8_t ku = 0;
-        uint8_t kbm = 0;
         uint8_t kfly2 = 0;
-        volatile bool locked = false;
         volatile bool shooter_running = false;
         Servo srv;
 };

@@ -2,12 +2,11 @@
 #include "driver/mcpwm.h"
 #include "esp_attr.h"
 
-
 void setupMCPWM_sh(uint8_t kfly, uint8_t kfly2, uint8_t ku){
     // reserved setup for Shooter
 
     mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0A, kfly);
-    mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0B, kfly2);
+    mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM2A, kfly2);
     mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM1A, ku);
 
     // Reserve mcpwm unit 1 for shooter
@@ -22,6 +21,7 @@ void setupMCPWM_sh(uint8_t kfly, uint8_t kfly2, uint8_t ku){
     // Init mcpwm 
     mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_0, &pwm_conf);
     mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_1, &pwm_conf);
+    mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_2, &pwm_conf);
 }
 
 Shooter::Shooter(uint8_t kfly, uint8_t kfly2, int8_t ksvb, uint8_t ku, uint8_t kbm){
@@ -32,30 +32,30 @@ Shooter::Shooter(uint8_t kfly, uint8_t kfly2, int8_t ksvb, uint8_t ku, uint8_t k
     this->kfly2 = kfly2;
         
     setupMCPWM_sh(kfly,kfly2, ku);
-    attachInterruptArg(digitalPinToInterrupt(kbm), feedInterrupt, this, CHANGE);
 }
 
 void Shooter::begin(){
+    pinMode(kbm,INPUT);
     srv.setPeriodHertz(50);    // standard 50 hz servo
 	srv.attach(ksvb); 
     srv.write(180);
 }
 
 void Shooter::enabled(bool en){
-     setMotor(MCPWM_UNIT_1,MCPWM_TIMER_0,-255 * en);
+     setMotor(MCPWM_UNIT_1,MCPWM_TIMER_0,255 * en);
+     setMotor(MCPWM_UNIT_1,MCPWM_TIMER_2, 255 * en);
      shooter_running = en;
 }
 
 
 void Shooter::setAngle(int angle){
-    if (angle < 140 || angle > 180) return; // hardware protectio
+    if (angle < 150 || angle > 180) return; // hardware protectio
                 
     srv.write(angle);
 }
 
 
 void Shooter::shoot(){
-    if (!locked) return;
     
     if (!shooter_running){
         enabled(true); 
@@ -75,13 +75,4 @@ void Shooter::setFeed(uint8_t speed){
     setMotor(MCPWM_UNIT_1,MCPWM_TIMER_1,speed);
 }
 
-void IRAM_ATTR Shooter::feedInterrupt(void* arg){
-    Shooter* self = static_cast<Shooter*>(arg);
-    if (digitalRead(self->kbm) == HIGH){ // If not broken
-        self->locked = false;
-        return;
-    }
 
-    self->locked = true;
-    self->setFeed(0); 
-}
