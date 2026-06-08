@@ -4,13 +4,14 @@
 #include <cstdint>
 #include <ESP32Servo.h>
 #include <driver/mcpwm.h>
+#include <sys/types.h>
 
 void setMotor(mcpwm_unit_t unit, mcpwm_timer_t timer, float val);
 
 class Shooter{
     public:         
         //flywheel motor out  //servo base  // motor feed // beam break in
-        Shooter(uint8_t kfly, uint8_t ksvb, uint8_t ku, uint8_t kbm);
+        Shooter(uint8_t kfly, uint8_t kfly2, int8_t ksvb, uint8_t ku, uint8_t kbm);
         
         void begin();
         void setAngle(int angle);
@@ -25,6 +26,7 @@ class Shooter{
         uint8_t ksvb = 0;
         uint8_t ku = 0;
         uint8_t kbm = 0;
+        uint8_t kfly2 = 0;
         volatile bool locked = false;
         volatile bool shooter_running = false;
         Servo srv;
@@ -33,14 +35,15 @@ class Shooter{
 
 class Intake{
     public:
-        //  upper roller motor outs    // beam break
-        Intake(uint8_t ku);
+        //  upper roller motor outs
+        Intake(uint8_t ku, uint8_t ku2);
 
-        void setSpeed(uint8_t speed);
+        void setSpeed(uint8_t speed, bool reversed = false);
         void off();
 
     private:
         uint8_t ku = 0;
+        uint8_t ku2 = 0;
 };
 
 

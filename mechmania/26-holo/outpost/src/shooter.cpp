@@ -3,10 +3,11 @@
 #include "esp_attr.h"
 
 
-void setupMCPWM_sh(uint8_t kfly,uint8_t ku){
+void setupMCPWM_sh(uint8_t kfly, uint8_t kfly2, uint8_t ku){
     // reserved setup for Shooter
 
     mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0A, kfly);
+    mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0B, kfly2);
     mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM1A, ku);
 
     // Reserve mcpwm unit 1 for shooter
@@ -23,13 +24,14 @@ void setupMCPWM_sh(uint8_t kfly,uint8_t ku){
     mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_1, &pwm_conf);
 }
 
-Shooter::Shooter(uint8_t kfly, uint8_t ksvb, uint8_t ku, uint8_t kbm){
+Shooter::Shooter(uint8_t kfly, uint8_t kfly2, int8_t ksvb, uint8_t ku, uint8_t kbm){
     this->kfly = kfly;
     this->ksvb = ksvb;
     this->ku = ku;
     this->kbm = kbm;
+    this->kfly2 = kfly2;
         
-    setupMCPWM_sh(kfly, ku);
+    setupMCPWM_sh(kfly,kfly2, ku);
     attachInterruptArg(digitalPinToInterrupt(kbm), feedInterrupt, this, CHANGE);
 }
 
@@ -40,7 +42,7 @@ void Shooter::begin(){
 }
 
 void Shooter::enabled(bool en){
-     setMotor(MCPWM_UNIT_1,MCPWM_TIMER_0,255 * en);
+     setMotor(MCPWM_UNIT_1,MCPWM_TIMER_0,-255 * en);
      shooter_running = en;
 }
 

@@ -20,12 +20,13 @@ void setMotor(mcpwm_unit_t unit, mcpwm_timer_t timer, float val){
     }
 }
 
-void setupMCPWM_in(uint8_t ku){
+void setupMCPWM_in(uint8_t ku, uint8_t ku2){
     // reserved setup for Intake
 
 
     mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, ku);
-
+    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0B, ku2);
+    
     // Reserve mcpwm unit 0 for intake
 
     mcpwm_config_t pwm_conf;
@@ -41,14 +42,15 @@ void setupMCPWM_in(uint8_t ku){
 
 
 
-Intake::Intake(uint8_t ku){
+Intake::Intake(uint8_t ku, uint8_t ku2){
     this->ku = ku;
+    this->ku2 = ku2;
     
-    setupMCPWM_in(ku);
+    setupMCPWM_in(ku,ku2);
 }
 
-void Intake::setSpeed(uint8_t speed){
-     setMotor(MCPWM_UNIT_0,MCPWM_TIMER_0,speed);     
+void Intake::setSpeed(uint8_t speed, bool reversed){
+     setMotor(MCPWM_UNIT_0,MCPWM_TIMER_0,speed * (reversed?-1:1));     
 }
 
 void Intake::off(){
